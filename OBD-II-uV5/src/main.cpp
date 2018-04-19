@@ -121,6 +121,33 @@ int main(void)
 	
   // Main loop
 	
+	unsigned char adcData[8] = "hai";
+	CAN_msg adcMessage[1];
+	adcMessage->id = 0xBADCAFE;
+	for (int i = 0; i < 8; i++) 
+	{adcMessage->data[i] = adcData[i];}
+	adcMessage->len = 8;
+	adcMessage->format = STANDARD;
+	adcMessage->type = DATA_FRAME;
+	
+	unsigned char led8Data[8] = "world";
+	CAN_msg led8Message[1];
+	led8Message->id = 0x01A4F2B;
+	for (int i = 0; i < 8; i++) 
+	{led8Message->data[i] = led8Data[i];}
+	adcMessage->len = 8;
+	adcMessage->format = STANDARD;
+	adcMessage->type = DATA_FRAME;
+	
+	unsigned char led9Data[8] = "world";
+	CAN_msg led9Message[1];
+	led8Message->id = 0x0024FCE;
+	for (int i = 0; i < 8; i++) 
+	{led8Message->data[i] = led8Data[i];}
+	adcMessage->len = 8;
+	adcMessage->format = STANDARD;
+	adcMessage->type = DATA_FRAME;
+	
   while (1)
   {
 // Read User Button

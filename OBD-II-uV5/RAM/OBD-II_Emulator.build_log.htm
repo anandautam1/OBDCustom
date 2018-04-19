@@ -21,23 +21,43 @@ Target DLL:      UL2CM3.DLL V1.160.12.0
 Dialog DLL:      TCM.DLL V1.35.1.0
  
 <h2>Project:</h2>
-C:\Users\Ananda Utama\Documents\RMIT2018\AutoApps\OBD-II-uV5-1\OBD-II-uV5\OBD-II_Emulator.uvprojx
+C:\Users\Ananda Utama\Documents\GitHub\OBDCustom\OBD-II-uV5\OBD-II_Emulator.uvprojx
 Project File Date:  04/12/2018
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'STM32F1 RAM'
 compiling main.cpp...
-src\main.cpp(110): error:  #167: argument of type "int" is incompatible with parameter of type "volatile unsigned int *"
-  	rCAN1_MCR.d32 = readRegister(CAN1_BASE_ADDR+RCAN_MCR);
-src\main.cpp(49): warning:  #550-D: variable "Pin_D0"  was set but never used
+src\main.cpp(55): warning:  #550-D: variable "Pin_D0"  was set but never used
   	GPIO_Config Pin_D0[1];
-src\main.cpp(55): warning:  #550-D: variable "Pin_D1"  was set but never used
+src\main.cpp(61): warning:  #550-D: variable "Pin_D1"  was set but never used
   	GPIO_Config Pin_D1[1];
-src\main.cpp(108): warning:  #177-D: variable "rCAN1_BTR"  was declared but never referenced
+src\main.cpp(125): warning:  #550-D: variable "adcMessage"  was set but never used
+  	CAN_msg adcMessage[1];
+src\main.cpp(134): warning:  #550-D: variable "led8Message"  was set but never used
+  	CAN_msg led8Message[1];
+src\main.cpp(142): warning:  #177-D: variable "led9Data"  was declared but never referenced
+  	unsigned char led9Data[8] = "world";
+src\main.cpp(143): warning:  #177-D: variable "led9Message"  was declared but never referenced
+  	CAN_msg led9Message[1];
+src\main.cpp(205): warning:  #177-D: variable "rCAN1_MSR"  was declared but never referenced
+  	CAN_MSR rCAN1_MSR;
+src\main.cpp(207): warning:  #177-D: variable "rCAN1_BTR"  was declared but never referenced
   	CAN_BTR rCAN1_BTR;
-src\main.cpp: 3 warnings, 1 error
-".\RAM\OBD-II_Emulator.axf" - 1 Error(s), 3 Warning(s).
+src\main.cpp(208): warning:  #177-D: variable "rCAN1_TSR"  was declared but never referenced
+  	CAN_TSR rCAN1_TSR;
+src\main.cpp(210): warning:  #177-D: variable "rCAN_TI1R"  was declared but never referenced
+  	CAN_TIxR rCAN_TI1R;
+src\main.cpp(211): warning:  #177-D: variable "rCAN_TDT1R"  was declared but never referenced
+  	CAN_TDTxR rCAN_TDT1R;
+src\main.cpp(213): warning:  #177-D: variable "rCAN_TDL1R"  was declared but never referenced
+  	CAN_TDLxR rCAN_TDL1R;
+src\main.cpp(214): warning:  #177-D: variable "rCAN_TDH1R"  was declared but never referenced
+  	CAN_TDHxR rCAN_TDH1R;
+src\main.cpp: 13 warnings, 0 errors
+linking...
+Program Size: Code=6076 RO-data=392 RW-data=20 ZI-data=1636  
+".\RAM\OBD-II_Emulator.axf" - 0 Error(s), 13 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -64,11 +84,10 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.1.1
 
    * Component: Keil::Device:Startup:1.0.0
-      Source file:   Device\Source\ARM\startup_stm32f10x_cl.s
       Source file:   Device\Source\system_stm32f10x.c
       Include file:  RTE_Driver\Config\RTE_Device.h
       Source file:   Device\Source\ARM\STM32F1xx_OPT.s
-Target not created.
+      Source file:   Device\Source\ARM\startup_stm32f10x_cl.s
 Build Time Elapsed:  00:00:01
 </pre>
 </body>
