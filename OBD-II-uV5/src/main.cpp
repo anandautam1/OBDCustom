@@ -104,16 +104,6 @@ int main(void)
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
 	
-	CAN_MCR rCAN1_MCR;
-	CAN_BTR rCAN1_BTR;
-
-	rCAN1_MCR.d32 = readRegister((volatile unsigned int *)CAN1_BASE_ADDR+RCAN_MCR);
-
-	rCAN1_MCR.b.binrq = 1;
-
-	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
-	
-	
 	// GPIOControl->enableLabSpecsMode(PER_CAN1,REMAP0);
 	
 	// configure the switch 
@@ -149,4 +139,25 @@ unsigned int readRegister(volatile unsigned int * iregisterAddress){
 }
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket){
 	*iregisterAddress = idataPacket;
+}
+
+void initializeLabSpecs()
+{
+	// delacre the variable register with the offset 
+	CAN_MCR rCAN1_MCR;
+	CAN_MSR rCAN1_MSR;
+	
+	CAN_BTR rCAN1_BTR;
+	CAN_TSR rCAN1_TSR;
+	
+	CAN_TIxR rCAN_TI1R;
+	CAN_TDTxR rCAN_TDT1R;
+	
+	CAN_TDLxR rCAN_TDL1R;
+	CAN_TDHxR rCAN_TDH1R;
+	
+	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	rCAN1_MCR.b.binrq = 1;
+	rCAN1_MCR.b.bsleep = 0;
+	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
 }
