@@ -622,6 +622,21 @@ typedef union _CAN_FiRx 			/* Address offset: 0x240...0x31C */
   } b;
 } CAN_FiRx ;
 
+// additional code for the can message format 
+#define STANDARD 0x00;
+#define EXTENDED_IDENTIFIER 0x01
+#define DATA_FRAME 0x00;
+#define REMOTE_FRAME 0x01;
+
+typedef struct _CAN_msg
+{
+	unsigned int   id;                 // 29 bit identifier
+  unsigned char  data[8];            // Data field
+  unsigned char  len;                // Length of data field in bytes
+  unsigned char  format;             // 0 - STANDARD, 1- EXTENDED IDENTIFIER
+  unsigned char  type;               // 0 - DATA FRAME, 1 - REMOTE FRAME
+} CAN_msg;
+
 #endif 
 
 

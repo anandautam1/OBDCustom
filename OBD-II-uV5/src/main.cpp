@@ -5,6 +5,7 @@
 #include "GPIOController.h"
 #include "utility.h"
 #include "canRegisters.h"
+#include <string>
 
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket);
@@ -114,6 +115,33 @@ int main(void)
 	// Configure can bus clock and all the specs 
 	
   // Main loop
+	unsigned char adcData[8] = "hai";
+	CAN_msg adcMessage[1];
+	adcMessage->id = 0xBADCAFE;
+	for (int i = 0; i < 8; i++) 
+	{adcMessage->data[i] = adcData[i];}
+	adcMessage->len = 8;
+	adcMessage->format = STANDARD;
+	adcMessage->type = DATA_FRAME;
+	
+	unsigned char led8Data[8] = "world";
+	CAN_msg led8Message[1];
+	led8Message->id = 0x01A4F2B;
+	for (int i = 0; i < 8; i++) 
+	{led8Message->data[i] = led8Data[i];}
+	adcMessage->len = 8;
+	adcMessage->format = STANDARD;
+	adcMessage->type = DATA_FRAME;
+	
+	unsigned char led9Data[8] = "world";
+	CAN_msg led9Message[1];
+	led8Message->id = 0x0024FCE;
+	for (int i = 0; i < 8; i++) 
+	{led8Message->data[i] = led8Data[i];}
+	adcMessage->len = 8;
+	adcMessage->format = STANDARD;
+	adcMessage->type = DATA_FRAME;
+	
 	
   while (1)
   {
@@ -155,9 +183,35 @@ void initializeLabSpecs()
 	
 	CAN_TDLxR rCAN_TDL1R;
 	CAN_TDHxR rCAN_TDH1R;
+	// end of definition
 	
 	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	// initialize the bit 
 	rCAN1_MCR.b.binrq = 1;
+	// set to 1 even if packet error occurs 
+	rCAN1_MCR.b.bnart = 1;
+	// set reset to 1 to check if the periperhals has been resetted 
+	rCAN1_MCR.b.breset = 1;
+	// exit the sleep mode 
 	rCAN1_MCR.b.bsleep = 0;
 	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
+	
+	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	while(rCAN1_MCR.b.breset)
+	{
+		rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	}
+	 
+	// the apbr1 default clock is 36MHz 
+	// bit field 8 brp set to 8 ... 
+	rCAN1_BTR.b.bbrp = 8;
+	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
+	
+}
+
+
+
+void CAN1_Tx_mess()
+{
+
 }
