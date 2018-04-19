@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\RAM\OBD-II_Emulator.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\RAM\OBD-II_Emulator.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Thu Apr 19 19:51:55 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Thu Apr 19 20:52:35 2018
 <BR><P>
-<H3>Maximum Stack Usage =        456 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        448 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main &rArr; GPIOController::enablePeripheral(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableCAN(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableGPIOClock(GPIOPort) &rArr; RCCController::enablePeripheral(RCCPeripheral) &rArr; RCCController::enableADC(RCCPeripheral)
 <P>
@@ -213,7 +213,7 @@ Global Symbols
 <P><STRONG><a name="[a6]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[5f]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 456 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 448 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; GPIOController::enablePeripheral(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableCAN(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableGPIOClock(GPIOPort) &rArr; RCCController::enablePeripheral(RCCPeripheral) &rArr; RCCController::enableADC(RCCPeripheral)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
@@ -236,8 +236,8 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_sys_exit
 </UL>
 
-<P><STRONG><a name="[60]"></a>main</STRONG> (Thumb, 470 bytes, Stack size 344 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 456<LI>Call Chain = main &rArr; GPIOController::enablePeripheral(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableCAN(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableGPIOClock(GPIOPort) &rArr; RCCController::enablePeripheral(RCCPeripheral) &rArr; RCCController::enableADC(RCCPeripheral)
+<P><STRONG><a name="[60]"></a>main</STRONG> (Thumb, 460 bytes, Stack size 336 bytes, main.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 448<LI>Call Chain = main &rArr; GPIOController::enablePeripheral(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableCAN(GPIOPeripheral, GPIORemap) &rArr; GPIOController::enableGPIOClock(GPIOPort) &rArr; RCCController::enablePeripheral(RCCPeripheral) &rArr; RCCController::enableADC(RCCPeripheral)
 </UL>
 <BR>[Calls]<UL><LI><a href="#[66]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_vec_ctor_nocookie_nodtor
 <LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIOController::GPIOController(RCCController*)
@@ -258,12 +258,12 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initializeLabSpecs()
 </UL>
 
-<P><STRONG><a name="[6d]"></a>initializeLabSpecs()</STRONG> (Thumb, 38 bytes, Stack size 8 bytes, main.o(.text), UNUSED)
+<P><STRONG><a name="[6d]"></a>initializeLabSpecs()</STRONG> (Thumb, 106 bytes, Stack size 12 bytes, main.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;writeRegister(volatile unsigned*, unsigned)
 <LI><a href="#[6e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;readRegister(volatile unsigned*)
 </UL>
 
-<P><STRONG><a name="[a9]"></a>txCAN(int, int)</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, main.o(.text), UNUSED)
+<P><STRONG><a name="[a9]"></a>txCAN(_CAN_msg*)</STRONG> (Thumb, 142 bytes, Stack size 0 bytes, main.o(.text), UNUSED)
 
 <P><STRONG><a name="[aa]"></a>toggle_led(int)</STRONG> (Thumb, 54 bytes, Stack size 0 bytes, main.o(.text), UNUSED)
 

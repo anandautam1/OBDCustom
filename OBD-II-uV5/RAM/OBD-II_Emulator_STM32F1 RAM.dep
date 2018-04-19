@@ -1,5 +1,5 @@
 Dependencies for Project 'OBD-II_Emulator', Target 'STM32F1 RAM': (DO NOT MODIFY !)
-F (.\src\main.cpp)(0x5AD865B9)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
+F (.\src\main.cpp)(0x5AD874D5)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
 I (.\inc\stm32f10x_it.h)(0x4D997B6E)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
 I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC20E)
@@ -12,7 +12,7 @@ I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.
 I (.\inc\RCCController.h)(0x55EE17BE)
 I (.\inc\GPIOController.h)(0x5ACEC2EB)
 I (.\inc\utility.h)(0x55EE2D16)
-I (.\inc\canRegisters.h)(0x5AD864E2)
+I (.\inc\canRegisters.h)(0x5AD8680D)
 F (.\src\stm32f10x_it.c)(0x4D997B6E)(-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\stm32f10x_it.o --omf_browse .\ram\stm32f10x_it.crf --depend .\ram\stm32f10x_it.d)
 I (.\inc\stm32f10x_it.h)(0x4D997B6E)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
@@ -54,7 +54,7 @@ F (.\inc\stm32f10x_conf.h)(0x4D997B6E)()
 F (.\inc\gpioRegisters.h)(0x55E935E4)()
 F (.\inc\rccRegisters.h)(0x55E4FE34)()
 F (.\inc\GPIOController.h)(0x5ACEC2EB)()
-F (.\inc\canRegisters.h)(0x5AD864E2)()
+F (.\inc\canRegisters.h)(0x5AD8680D)()
 F (.\inc\RCCController.h)(0x55EE17BE)()
 F (.\inc\adcRegisters.h)(0x55ECCF5A)()
 F (.\inc\utility.h)(0x55EE2D16)()

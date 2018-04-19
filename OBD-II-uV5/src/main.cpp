@@ -130,7 +130,7 @@ int main(void)
 	adcMessage->format = STANDARD;
 	adcMessage->type = DATA_FRAME;
 	
-	unsigned char led8Data[4] = "worl";
+	unsigned char led8Data[4] = "wor";
 	CAN_msg led8Message[1];
 	led8Message->id = 0x01A4F2B;
 	for (int i = 0; i < 4; i++) 
@@ -139,7 +139,7 @@ int main(void)
 	led8Message->format = STANDARD;
 	led8Message->type = DATA_FRAME;
 	
-	unsigned char led9Data[4] = "worl";
+	unsigned char led9Data[4] = "wor";
 	CAN_msg led9Message[1];
 	led9Message->id = 0x0024FCE;
 	for (int i = 0; i < 4; i++) 
@@ -206,42 +206,68 @@ void initializeLabSpecs()
 	
 	CAN_BTR rCAN1_BTR;
 	CAN_TSR rCAN1_TSR;
-	
-	CAN_TIxR rCAN_TI1R;
-	CAN_TDTxR rCAN_TDT1R;
-	
-	CAN_TDLxR rCAN_TDL1R;
-	CAN_TDHxR rCAN_TDH1R;
+	// end of definition 
 	
 	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	// initialize the bit 
 	rCAN1_MCR.b.binrq = 1;
+	// set to 1 even if packet error occurs 
+	rCAN1_MCR.b.bnart = 1;
+	// set reset to 1 to check if the periperhals has been resetted 
+	rCAN1_MCR.b.breset = 1;
+	// exit the sleep mode 
 	rCAN1_MCR.b.bsleep = 0;
 	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
+	
+	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	while(rCAN1_MCR.b.breset)
+	{
+		rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	}
+	 
+	// the apbr1 default clock is 36MHz 
+	// bit field 8 brp set to 8 ... 
+	rCAN1_BTR.b.bbrp = 8;
+	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
 }
 
 void txCAN(CAN_msg *finalMessage)
 {
-	/*
+	// need to be enabled first 
+	CAN_TDTxR rCAN_TDT1R;
+	
+	// mailbox registers
+	// low bit 
+	CAN_TDLxR rCAN_TDL1R;
+	// high bit
+	CAN_TDHxR rCAN_TDH1R;
+	
+	// need to be enabled when performing sending 
+	CAN_TIxR rCAN_TI1R;
+	
+	//rCAN_TI1R.
+	
 	CAN1->sTxMailBox[0].TIR  = (unsigned int)(finalMessage->id << 3) | 4; 
-	if (finalMessage->type == DATA_FRAME){								// DATA FRAME
+	int temp = DATA_FRAME;
+	if (finalMessage->type == temp){								// DATA FRAME
 		CAN1->sTxMailBox[0].TIR &= ~(1<<1);
 	}
 	// REMOTE FRAME
 	else{
 		CAN1->sTxMailBox[0].TIR |= 1<<1;
 	}
-  CAN1->sTxMailBox[0].TDLR = (((unsigned int)msg->data[3] << 24) | 
-                             ((unsigned int)msg->data[2] << 16) |
-                             ((unsigned int)msg->data[1] <<  8) | 
-                             ((unsigned int)msg->data[0])        );
-  CAN1->sTxMailBox[0].TDHR = (((unsigned int)msg->data[7] << 24) | 
-                             ((unsigned int)msg->data[6] << 16) |
-                             ((unsigned int)msg->data[5] <<  8) |
-                             ((unsigned int)msg->data[4])        );
+  CAN1->sTxMailBox[0].TDLR = (((unsigned int)finalMessage->data[3] << 24) | 
+                             ((unsigned int)finalMessage->data[2] << 16) |
+                             ((unsigned int)finalMessage->data[1] <<  8) | 
+                             ((unsigned int)finalMessage->data[0])        );
+  CAN1->sTxMailBox[0].TDHR = (((unsigned int)finalMessage->data[7] << 24) | 
+                             ((unsigned int)finalMessage->data[6] << 16) |
+                             ((unsigned int)finalMessage->data[5] <<  8) |
+                             ((unsigned int)finalMessage->data[4])        );
   CAN1->sTxMailBox[0].TDTR &= ~0xf; // Setup length
-  CAN1->sTxMailBox[0].TDTR |=  (msg->len & 0xf);
+  CAN1->sTxMailBox[0].TDTR |=  (finalMessage->len & 0xf);
   CAN1->sTxMailBox[0].TIR |=  1;                     // transmit message
-	*/
+	
 }
 
 void toggle_led(int LED)
