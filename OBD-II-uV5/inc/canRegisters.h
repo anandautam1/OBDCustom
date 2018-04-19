@@ -631,7 +631,7 @@ typedef union _CAN_FiRx 			/* Address offset: 0x240...0x31C */
 typedef struct _CAN_msg
 {
 	unsigned int   id;                 // 29 bit identifier
-  unsigned char  data[8];            // Data field
+  unsigned char  data[4];            // Data field
   unsigned char  len;                // Length of data field in bytes
   unsigned char  format;             // 0 - STANDARD, 1- EXTENDED IDENTIFIER
   unsigned char  type;               // 0 - DATA FRAME, 1 - REMOTE FRAME

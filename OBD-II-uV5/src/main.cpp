@@ -121,21 +121,21 @@ int main(void)
 	
   // Main loop
 	
-	unsigned char adcData[8] = "hai";
+	unsigned char adcData[4] = "hai";
 	CAN_msg adcMessage[1];
 	adcMessage->id = 0xBADCAFE;
-	for (int i = 0; i < 8; i++) 
+	for (int i = 0; i < 4; i++) 
 	{adcMessage->data[i] = adcData[i];}
-	adcMessage->len = 8;
+	adcMessage->len = 4;
 	adcMessage->format = STANDARD;
 	adcMessage->type = DATA_FRAME;
 	
 	unsigned char led8Data[8] = "world";
 	CAN_msg led8Message[1];
 	led8Message->id = 0x01A4F2B;
-	for (int i = 0; i < 8; i++) 
+	for (int i = 0; i < 4; i++) 
 	{led8Message->data[i] = led8Data[i];}
-	adcMessage->len = 8;
+	adcMessage->len = 4;
 	adcMessage->format = STANDARD;
 	adcMessage->type = DATA_FRAME;
 	
@@ -144,7 +144,7 @@ int main(void)
 	led8Message->id = 0x0024FCE;
 	for (int i = 0; i < 8; i++) 
 	{led8Message->data[i] = led8Data[i];}
-	adcMessage->len = 8;
+	adcMessage->len = 4;
 	adcMessage->format = STANDARD;
 	adcMessage->type = DATA_FRAME;
 	
@@ -219,11 +219,29 @@ void initializeLabSpecs()
 	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
 }
 
-void txCAN(int ADDR, int DATA)
+void txCAN(CAN_msg *finalMessage)
 {
-	// Send payload, DATA to the address, ADDR
-
-
+	/*
+	CAN1->sTxMailBox[0].TIR  = (unsigned int)(finalMessage->id << 3) | 4; 
+	if (finalMessage->type == DATA_FRAME){								// DATA FRAME
+		CAN1->sTxMailBox[0].TIR &= ~(1<<1);
+	}
+	// REMOTE FRAME
+	else{
+		CAN1->sTxMailBox[0].TIR |= 1<<1;
+	}
+  CAN1->sTxMailBox[0].TDLR = (((unsigned int)msg->data[3] << 24) | 
+                             ((unsigned int)msg->data[2] << 16) |
+                             ((unsigned int)msg->data[1] <<  8) | 
+                             ((unsigned int)msg->data[0])        );
+  CAN1->sTxMailBox[0].TDHR = (((unsigned int)msg->data[7] << 24) | 
+                             ((unsigned int)msg->data[6] << 16) |
+                             ((unsigned int)msg->data[5] <<  8) |
+                             ((unsigned int)msg->data[4])        );
+  CAN1->sTxMailBox[0].TDTR &= ~0xf; // Setup length
+  CAN1->sTxMailBox[0].TDTR |=  (msg->len & 0xf);
+  CAN1->sTxMailBox[0].TIR |=  1;                     // transmit message
+	*/
 }
 
 void toggle_led(int LED)
