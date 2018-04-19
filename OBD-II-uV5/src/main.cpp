@@ -1,13 +1,19 @@
-
-
 #include "stm32f10x_it.h"
 #include "RCCController.h"
 #include "GPIOController.h"
 #include "utility.h"
 #include "canRegisters.h"
 
+// Function Prototypes
+
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket);
+
+void txCAN(int ADDR, int DATA);
+// TODO - prototype for RX DATA data
+// int rxCAN();
+
+void toggle_led(int LED);
 
 //******************************************************************************//
 // Function: main()
@@ -117,11 +123,28 @@ int main(void)
 	
   while (1)
   {
+// Read User Button
+		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
+		{
+			// TODO - TX CAN
+			// Send 0x01 to CAN Address 0x01AEFCA
+			
+			
+			// TODO - Check mailbox
+			
+			
+			// DEBUG
+			//GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
+		}
+		else
+		{
+			// Do nothing if button isn't pressed
+			
+			// DEBUG 
+			//GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
+		}
 		
-		// if user button pressed 
-		// transmitCAN( address, data, labspecsmode)
-		// check if there is an empty mailbox 
-		
+		// TODO
 		// if another button pressed
 		// transmitCAN( address, data, labspecsmode)
 		
@@ -131,9 +154,16 @@ int main(void)
 		// receiveCAN( address, result, labspecsmode) 
 		
 		//GPIOControl->writeRegister(
+		
+		delay_software_ms(10);
+
+		
+		//toggle_led(1 << 9);
   }
 } 
 
+
+// Function Definitions
 unsigned int readRegister(volatile unsigned int * iregisterAddress){
 	return (*iregisterAddress);
 }
@@ -161,3 +191,36 @@ void initializeLabSpecs()
 	rCAN1_MCR.b.bsleep = 0;
 	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
 }
+
+void txCAN(int ADDR, int DATA)
+{
+	// Send payload, DATA to the address, ADDR
+
+
+}
+
+void toggle_led(int LED)
+{
+	int LED_BANK;
+	
+	LED_BANK = GPIOE->IDR;
+	
+	// If LED is on
+	if (LED_BANK & LED)
+	{
+		// Turn LED off
+		GPIOE->ODR &= ~(LED); 
+	}
+	else if (LED_BANK & ~(LED))
+	{
+		// Turn LED on
+		GPIOE->ODR |= LED;
+	}
+	else
+	{
+		// What is happening - Bad Case
+		LED = 256;
+	}	
+}
+
+// EOF
