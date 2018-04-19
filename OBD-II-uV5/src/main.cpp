@@ -130,23 +130,23 @@ int main(void)
 	adcMessage->format = STANDARD;
 	adcMessage->type = DATA_FRAME;
 	
-	unsigned char led8Data[8] = "world";
+	unsigned char led8Data[4] = "worl";
 	CAN_msg led8Message[1];
 	led8Message->id = 0x01A4F2B;
 	for (int i = 0; i < 4; i++) 
 	{led8Message->data[i] = led8Data[i];}
-	adcMessage->len = 4;
-	adcMessage->format = STANDARD;
-	adcMessage->type = DATA_FRAME;
+	led8Message->len = 4;
+	led8Message->format = STANDARD;
+	led8Message->type = DATA_FRAME;
 	
-	unsigned char led9Data[8] = "world";
+	unsigned char led9Data[4] = "worl";
 	CAN_msg led9Message[1];
-	led8Message->id = 0x0024FCE;
-	for (int i = 0; i < 8; i++) 
-	{led8Message->data[i] = led8Data[i];}
-	adcMessage->len = 4;
-	adcMessage->format = STANDARD;
-	adcMessage->type = DATA_FRAME;
+	led9Message->id = 0x0024FCE;
+	for (int i = 0; i < 4; i++) 
+	{led9Message->data[i] = led8Data[i];}
+	led9Message->len = 4;
+	led9Message->format = STANDARD;
+	led9Message->type = DATA_FRAME;
 	
   while (1)
   {
