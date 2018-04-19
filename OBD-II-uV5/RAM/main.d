@@ -1,0 +1,14 @@
+.\ram\main.o: src\main.cpp
+.\ram\main.o: .\inc\stm32f10x_it.h
+.\ram\main.o: C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h
+.\ram\main.o: .\RTE\_STM32F1_RAM\RTE_Components.h
+.\ram\main.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm3.h
+.\ram\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\ram\main.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h
+.\ram\main.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_compiler.h
+.\ram\main.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_armcc.h
+.\ram\main.o: C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.h
+.\ram\main.o: .\inc\RCCController.h
+.\ram\main.o: .\inc\GPIOController.h
+.\ram\main.o: .\inc\utility.h
+.\ram\main.o: .\inc\canRegisters.h
