@@ -1,8 +1,8 @@
 Dependencies for Project 'OBD-II_Emulator', Target 'STM32F1 RAM': (DO NOT MODIFY !)
-F (.\src\main.cpp)(0x5AD984D7)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
+F (.\src\main.cpp)(0x5AD99BC5)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
 I (.\inc\stm32f10x_it.h)(0x4D997B6E)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
-I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC20E)
+I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC210)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm3.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599EB10E)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h)(0x5A5579C2)
@@ -10,13 +10,46 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_compiler.h)(0x5A8E03C
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_armcc.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.h)(0x58251C4C)
 I (.\inc\RCCController.h)(0x55EE17BE)
-I (.\inc\GPIOController.h)(0x5AD9632A)
+I (.\inc\GPIOController.h)(0x5AD9632C)
 I (.\inc\utility.h)(0x55EE2D16)
-I (.\inc\canRegisters.h)(0x5AD8680D)
+I (.\inc\canRegisters.h)(0x5AD8680E)
+I (.\inc\DispCode.h)(0x5AD72354)
+I (C:\Keil_v5\ARM\ARMCC\include\string)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\iosfwd)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_defs.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_config.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\config.h)(0x53103E1C)
+I (C:\Keil_v5\ARM\ARMCC\include\cwchar)(0x599EB10E)
+I (C:\Keil_v5\ARM\ARMCC\include\wchar.h)(0x599EB10E)
+I (C:\Keil_v5\ARM\ARMCC\include\limits)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_math.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\cmath)(0x599EB10C)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x599EB10E)
+I (C:\Keil_v5\ARM\ARMCC\include\cfloat)(0x599EB10C)
+I (C:\Keil_v5\ARM\ARMCC\include\float.h)(0x599EB10C)
+I (C:\Keil_v5\ARM\ARMCC\include\climits)(0x599EB10A)
+I (C:\Keil_v5\ARM\ARMCC\include\limits.h)(0x599EB10A)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_algobase.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\utility)(0x4EB18EC6)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_iterator.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_iterbase.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\cstddef)(0x599EB10E)
+I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x599EB10C)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_strref.h)(0x564D323C)
+I (C:\Keil_v5\ARM\ARMCC\include\memory)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\new)(0x599EB10E)
+I (C:\Keil_v5\ARM\ARMCC\include\exception)(0x599EB10A)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_mutex.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\cstring)(0x599EB10E)
+I (C:\Keil_v5\ARM\ARMCC\include\string.h)(0x599EB10C)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_traits.h)(0x564D323E)
+I (C:\Keil_v5\ARM\ARMCC\include\cstdio)(0x599EB10A)
+I (C:\Keil_v5\ARM\ARMCC\include\stdio.h)(0x599EB10C)
+I (C:\Keil_v5\ARM\ARMCC\include\rw\_error.h)(0x564D323E)
 F (.\src\stm32f10x_it.c)(0x4D997B6E)(-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\stm32f10x_it.o --omf_browse .\ram\stm32f10x_it.crf --depend .\ram\stm32f10x_it.d)
 I (.\inc\stm32f10x_it.h)(0x4D997B6E)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
-I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC20E)
+I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC210)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm3.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599EB10E)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h)(0x5A5579C2)
@@ -24,9 +57,9 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_compiler.h)(0x5A8E03C
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_armcc.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.h)(0x58251C4C)
 F (.\src\utility.cpp)(0x55EE331E)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\utility.o --omf_browse .\ram\utility.crf --depend .\ram\utility.d)
-F (.\src\GPIOController.cpp)(0x5AD967C3)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\gpiocontroller.o --omf_browse .\ram\gpiocontroller.crf --depend .\ram\gpiocontroller.d)
+F (.\src\GPIOController.cpp)(0x5AD967C4)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\gpiocontroller.o --omf_browse .\ram\gpiocontroller.crf --depend .\ram\gpiocontroller.d)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
-I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC20E)
+I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC210)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm3.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599EB10E)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h)(0x5A5579C2)
@@ -35,11 +68,11 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_armcc.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.h)(0x58251C4C)
 I (.\inc\utility.h)(0x55EE2D16)
 I (.\inc\RCCController.h)(0x55EE17BE)
-I (.\inc\GPIOController.h)(0x5AD9632A)
+I (.\inc\GPIOController.h)(0x5AD9632C)
 I (.\inc\gpioRegisters.h)(0x55E935E4)
-F (.\src\RCCController.cpp)(0x5AD803BD)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\rcccontroller.o --omf_browse .\ram\rcccontroller.crf --depend .\ram\rcccontroller.d)
+F (.\src\RCCController.cpp)(0x5AD803BE)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\rcccontroller.o --omf_browse .\ram\rcccontroller.crf --depend .\ram\rcccontroller.d)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
-I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC20E)
+I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC210)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm3.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599EB10E)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h)(0x5A5579C2)
@@ -49,20 +82,34 @@ I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.
 I (.\inc\utility.h)(0x55EE2D16)
 I (.\inc\rccRegisters.h)(0x55E4FE34)
 I (.\inc\RCCController.h)(0x55EE17BE)
+F (.\src\DispCode.cpp)(0x5AD72344)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\dispcode.o --omf_browse .\ram\dispcode.crf --depend .\ram\dispcode.d)
+I (.\inc\stm32f10x_cl.h)(0x5AD7236A)
+I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm3.h)(0x5A8E03C2)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599EB10E)
+I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h)(0x5A5579C2)
+I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_compiler.h)(0x5A8E03C2)
+I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_armcc.h)(0x5A8E03C2)
+I (.\inc\system_stm32f10x_cl.h)(0x5AD72374)
+I (.\inc\DispCode.h)(0x5AD72354)
+I (.\inc\Font_24x16.h)(0x5AD7235E)
 F (.\inc\stm32f10x_it.h)(0x4D997B6E)()
 F (.\inc\stm32f10x_conf.h)(0x4D997B6E)()
 F (.\inc\gpioRegisters.h)(0x55E935E4)()
 F (.\inc\rccRegisters.h)(0x55E4FE34)()
-F (.\inc\GPIOController.h)(0x5AD9632A)()
-F (.\inc\canRegisters.h)(0x5AD8680D)()
+F (.\inc\GPIOController.h)(0x5AD9632C)()
+F (.\inc\canRegisters.h)(0x5AD8680E)()
 F (.\inc\RCCController.h)(0x55EE17BE)()
 F (.\inc\adcRegisters.h)(0x55ECCF5A)()
 F (.\inc\utility.h)(0x55EE2D16)()
+F (.\inc\DispCode.h)(0x5AD72354)()
+F (.\inc\Font_24x16.h)(0x5AD7235E)()
+F (.\inc\stm32f10x_cl.h)(0x5AD7236A)()
+F (.\inc\system_stm32f10x_cl.h)(0x5AD72374)()
 F (RTE\Device\STM32F107VC\RTE_Device.h)(0x5242FC58)()
 F (RTE\Device\STM32F107VC\startup_stm32f10x_cl.s)(0x55ECF20E)(--cpu Cortex-M3 --pd "__EVAL SETA 1" -g --apcs=interwork -I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include--pd "__UVISION_VERSION SETA 525" --pd "_RTE_ SETA 1" --pd "STM32F10X_CL SETA 1"--list .\ram\startup_stm32f10x_cl.lst --xref -o .\ram\startup_stm32f10x_cl.o --depend .\ram\startup_stm32f10x_cl.d)
 F (RTE\Device\STM32F107VC\system_stm32f10x.c)(0x55ECF0BC)(-c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\system_stm32f10x.o --omf_browse .\ram\system_stm32f10x.crf --depend .\ram\system_stm32f10x.d)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
-I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC20E)
+I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC210)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\core_cm3.h)(0x5A8E03C2)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599EB10E)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_version.h)(0x5A5579C2)

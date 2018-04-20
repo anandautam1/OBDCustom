@@ -4,6 +4,7 @@
 ".\ram\utility.o"
 ".\ram\gpiocontroller.o"
 ".\ram\rcccontroller.o"
+".\ram\dispcode.o"
 ".\ram\startup_stm32f10x_cl.o"
 ".\ram\system_stm32f10x.o"
 --strict --scatter ".\RAM\OBD-II_Emulator.sct"

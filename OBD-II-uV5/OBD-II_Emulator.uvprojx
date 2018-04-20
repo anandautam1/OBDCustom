@@ -406,6 +406,11 @@
               <FileType>8</FileType>
               <FilePath>.\src\RCCController.cpp</FilePath>
             </File>
+            <File>
+              <FileName>DispCode.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\src\DispCode.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -455,6 +460,26 @@
               <FileName>utility.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\utility.h</FilePath>
+            </File>
+            <File>
+              <FileName>DispCode.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\DispCode.h</FilePath>
+            </File>
+            <File>
+              <FileName>Font_24x16.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\Font_24x16.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_cl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\stm32f10x_cl.h</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f10x_cl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\system_stm32f10x_cl.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -866,6 +891,11 @@
               <FileType>8</FileType>
               <FilePath>.\src\RCCController.cpp</FilePath>
             </File>
+            <File>
+              <FileName>DispCode.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\src\DispCode.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -915,6 +945,26 @@
               <FileName>utility.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\utility.h</FilePath>
+            </File>
+            <File>
+              <FileName>DispCode.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\DispCode.h</FilePath>
+            </File>
+            <File>
+              <FileName>Font_24x16.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\Font_24x16.h</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f10x_cl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\stm32f10x_cl.h</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f10x_cl.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\system_stm32f10x_cl.h</FilePath>
             </File>
           </Files>
         </Group>

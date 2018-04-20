@@ -3,13 +3,17 @@
 #include "GPIOController.h"
 #include "utility.h"
 #include "canRegisters.h"
+#include "DispCode.h"
+
+//#include <iostream>
+#include <string>
 
 // Function Prototypes
 
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket);
-void configureADC();
-int readADC();
+void configureAdc();
+int readAdc();
 
 void txCAN(int ADDR, int DATA);
 // TODO - prototype for RX DATA data
@@ -112,7 +116,7 @@ int main(void)
 	// checked the enable clock for GPIO D 
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
-	//configureADC();
+	configureAdc();
   //GPIOControl->enableADC(PER_ADC1, Pin_C4->Port, Pin_C4->Pin , 14);
 	
 	// GPIOControl->enableLabSpecsMode(PER_CAN1,REMAP0);
@@ -153,8 +157,20 @@ int main(void)
 	led9Message->format = STANDARD;
 	led9Message->type = DATA_FRAME;
 	
+	GLCD_Init();
+	GLCD_Clear(White);
+	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
+	
   while (1)
   {
+		
+		int result = readAdc();
+		char AdcLabel = "ADC value = "
+		char resultChars[10]; 
+		std::sprintf(resultChars,"%c %i",result);
+		GLCD_DisplayString(2, 1, (unsigned char*)resultChars);
+		
+		
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
@@ -295,7 +311,7 @@ void toggle_led(int LED)
 	}	
 }
 
-void configureADC()
+void configureAdc()
 {
 	RCC->APB2ENR |= 1 << 9; //Enable ADC clock
 	RCC->APB2ENR |= 1 << 4;	//Enable GPIOC clock
@@ -322,7 +338,7 @@ void configureADC()
 	while (ADC1->CR2 & (1<<2));	// wait until calibration finished.
 }
 
-int readADC()
+int readAdc()
 {
 			int result = 0; 
 			ADC1->CR2 |= (1<<22); 			//retrigger
