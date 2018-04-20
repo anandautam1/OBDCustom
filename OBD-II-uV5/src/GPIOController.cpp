@@ -295,14 +295,12 @@ void GPIOController::enablePeripheral(GPIOPeripheral inputDevice, GPIORemap inpu
 		{
 			enableCAN(inputDevice, inputConfig);
 			RCCControl->enablePeripheral(RCC_CAN1);
+			break;
 		}
 		case PER_CAN2:
 		{
 			enableCAN(inputDevice, inputConfig);
-			RCCControl->enablePeripheral(RCC_CAN2);
-			// change the master control register 
-			// change master status register 
-			// change the bit timing register 
+			RCCControl->enablePeripheral(RCC_CAN2); 
 			break;
 		}
 	}
@@ -900,8 +898,9 @@ void GPIOController::enableSPIChipSelect(GPIOPort externalChipSelectPort, GPIOPi
 // Return : None
 // Description : Bit set the GPIO Pin passed in..
 // *****************************************************************************//
-void GPIOController::enableADC(GPIOPeripheral inputDevice, GPIOPort * inputPort, GPIOPin * inputPin, unsigned char channelCount)
+void GPIOController::enableADC(GPIOPeripheral inputDevice, GPIOPort inputPort, GPIOPin inputPin, unsigned char channelCount)
 {
+	RCCControl->enablePeripheral(RCC_ADC1);
 	// The ADC peripheral is not used in alternate function.
 	GPIO_CRH rGPIO_CRH;
 	GPIO_CRL rGPIO_CRL;
@@ -910,34 +909,34 @@ void GPIOController::enableADC(GPIOPeripheral inputDevice, GPIOPort * inputPort,
 	for(unsigned char i = 0; i < channelCount; i++)
 	{
 		// Check to see whether the clock for the given pin is enabled.
-		if(GPIO[inputPort[i]].clockEnabled == 0)
+		if(GPIO[inputPort].clockEnabled == 0)
 		{
-				enableGPIOClock(inputPort[i]);
-				GPIO[inputPort[i]].clockEnabled = 1;
+				enableGPIOClock(inputPort);
+				GPIO[inputPort].clockEnabled = 1;
 		}
 		
 		// Check to see whether the pin is a 'high' or 'low' byte.
-		if(inputPin[i] <= 7)
+		if(inputPin <= 7)
 		{
-			rGPIO_CRL.d32 = readRegister(GPIO[inputPort[i]].configLowAddress);
+			rGPIO_CRL.d32 = readRegister(GPIO[inputPort].configLowAddress);
 				
 			// Clear out the mode and configuration bits.
-			rGPIO_CRL.d32 &= ~(0xF << (inputPin[i] * 4));
+			rGPIO_CRL.d32 &= ~(0xF << (inputPin * 4));
 		
-			rGPIO_CRL.d32 |= ((GPIO_IN_AN << 2) | GPIO_Reserved) << (inputPin[i] * 4);
-			writeRegister(GPIO[inputPort[i]].configLowAddress, rGPIO_CRL.d32);
+			rGPIO_CRL.d32 |= ((GPIO_IN_AN << 2) | GPIO_Reserved) << (inputPin * 4);
+			writeRegister(GPIO[inputPort].configLowAddress, rGPIO_CRL.d32);
 		
 		}
-		else if (inputPin[i] <= 15)
+		else if (inputPin <= 15)
 		{
 			// Due to the offset, subtract 8 from the GPIO Pin
-			rGPIO_CRH.d32 = readRegister(GPIO[inputPort[i]].configHighAddress);
+			rGPIO_CRH.d32 = readRegister(GPIO[inputPort].configHighAddress);
 
 			// Clear out the mode and configuration bits.
-			rGPIO_CRH.d32 &= ~(0xF << ((inputPin[i] - 8)* 4));
+			rGPIO_CRH.d32 &= ~(0xF << ((inputPin - 8)* 4));
 
-			rGPIO_CRH.d32 |= ((GPIO_IN_AN << 2) | GPIO_Reserved) << ((inputPin[i] - 8) * 4);
-			writeRegister(GPIO[inputPort[i]].configHighAddress, rGPIO_CRH.d32);
+			rGPIO_CRH.d32 |= ((GPIO_IN_AN << 2) | GPIO_Reserved) << ((inputPin - 8) * 4);
+			writeRegister(GPIO[inputPort].configHighAddress, rGPIO_CRH.d32);
 		}
 		
 	}

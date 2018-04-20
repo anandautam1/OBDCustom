@@ -91,7 +91,7 @@ class GPIOController
 		void enablePeripheral(GPIOPeripheral, GPIORemap);
 		void enableSPI(GPIOPeripheral, GPIORemap, bool);															// Configure the SPI Controller (the bool is used to select an external slave select)			
 		void enableSPIChipSelect(GPIOPort, GPIOPin);																	// Enable the external SPI chip select pin
-		void enableADC(GPIOPeripheral, GPIOPort * , GPIOPin *, unsigned char);				// Enable the ADC 
+		void enableADC(GPIOPeripheral, GPIOPort , GPIOPin, unsigned char);				// Enable the ADC 
 		
 		bool getPinValue(GPIOPort, GPIOPin);												// Obtain the current value of an I/O pin (IDR)
 		void setGPIO(GPIOPort, GPIOPin);														// Set an individual I/O Pin

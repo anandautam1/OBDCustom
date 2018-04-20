@@ -8,6 +8,8 @@
 
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket);
+void configureADC();
+int readADC();
 
 void txCAN(int ADDR, int DATA);
 // TODO - prototype for RX DATA data
@@ -30,6 +32,7 @@ int main(void)
 	
 	//rCAN_TSR.d32 = readRegister((unsigned int *)CAN1_BASE_ADDR + RCAN_TSR);
 	
+	// Wakeup switch on portA pin 0
 	GPIO_Config Pin_A[1];
 	Pin_A->Port = GPIO_A;
 	Pin_A->Pin = Pin0;
@@ -44,11 +47,11 @@ int main(void)
 	Pin_B->Speed = GPIO_50MHz;
 	
 	// ADC reading on Port C pin 4 
-	GPIO_Config Pin_C[1];
-	Pin_C->Port = GPIO_C;
-	Pin_C->Pin = Pin4;
-	Pin_C->Type = GPIO_Output_PushPull;
-	Pin_C->Speed = GPIO_Reserved;
+	GPIO_Config Pin_C4[1];
+	Pin_C4->Port = GPIO_C;
+	Pin_C4->Pin = Pin4;
+	Pin_C4->Type = GPIO_Output_PushPull;
+	Pin_C4->Speed = GPIO_Reserved;
 	
 	
 	// CAN bus mode RX and TX on PortD pin 0 and 1
@@ -90,8 +93,8 @@ int main(void)
 	GPIOControl->configureGPIO(Pin_B);
 	GPIOControl->setGPIO(Pin_B->Port, Pin_B->Pin);	
 
-	GPIOControl->configureGPIO(Pin_C);
-	GPIOControl->setGPIO(Pin_C->Port, Pin_C->Pin);
+	GPIOControl->configureGPIO(Pin_C4);
+	GPIOControl->setGPIO(Pin_C4->Port, Pin_C4->Pin);
 	
 	//GPIOControl->configureGPIO(Pin_D0);
 	//GPIOControl->setGPIO(Pin_D0->Port, Pin_D0->Pin);
@@ -109,6 +112,8 @@ int main(void)
 	// checked the enable clock for GPIO D 
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
+	configureADC();
+  //GPIOControl->enableADC(PER_ADC1, Pin_C4->Port, Pin_C4->Pin , 14);
 	
 	// GPIOControl->enableLabSpecsMode(PER_CAN1,REMAP0);
 	
@@ -120,8 +125,8 @@ int main(void)
 	// Configure can bus clock and all the specs 
 	
   // Main loop
-	
-	unsigned char adcData[4] = "hai";
+	int result = readADC();
+	unsigned char adcData[4] = "hel";
 	CAN_msg adcMessage[1];
 	adcMessage->id = 0xBADCAFE;
 	for (int i = 0; i < 4; i++) 
@@ -150,15 +155,13 @@ int main(void)
 	
   while (1)
   {
-// Read User Button
+		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
+			// TODO - Check mailbox
 			// TODO - TX CAN
 			// Send 0x01 to CAN Address 0x01AEFCA
-			
-			
-			// TODO - Check mailbox
-			
+			// check for the mailbox 
 			
 			// DEBUG
 			//GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
@@ -171,21 +174,16 @@ int main(void)
 			//GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		
-		// TODO
-		// if another button pressed
-		// transmitCAN( address, data, labspecsmode)
-		
-		// default will be to transmit the ADC code in bytes 
-		// transmitCAN( address, data, labspecsmode) 
-		
-		// receiveCAN( address, result, labspecsmode) 
-		
-		//GPIOControl->writeRegister(
-		
+		// Read Wakeup Button
+		if (!(GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
+		{
+			
+		}
+		else
+		{
+			
+		}
 		delay_software_ms(10);
-
-		
-		//toggle_led(1 << 9);
   }
 } 
 
@@ -219,6 +217,7 @@ void initializeLabSpecs()
 	rCAN1_MCR.b.bsleep = 0;
 	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
 	
+	// what till the MCR has been free
 	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
 	while(rCAN1_MCR.b.breset)
 	{
@@ -294,4 +293,41 @@ void toggle_led(int LED)
 	}	
 }
 
+void configureADC()
+{
+	RCC->APB2ENR |= 1 << 9; //Enable ADC clock
+	RCC->APB2ENR |= 1 << 4;	//Enable GPIOC clock
+	
+	GPIOC->CRL &= ~0x000F0000; 	//PC4 as ADC 14 input
+	GPIOE->CRH = 0x33333333;		//Configure GPIOE LEDS for Output
+		
+	ADC1->SQR1 = 0x00000000;		//Regular Channel 1 Conversion
+	ADC1->SQR2 = 0x00000000;		//Clear Register
+	ADC1->SQR3 = (14<<0);				//SQ1 = Channel 14
+	ADC1->SMPR1 = (5<<12);			//SAmple TIme Channel 14, 55, 5 cycles
+	
+	//ADC1->CR1 = (1<<8);				//Scan mode on
+
+	ADC1->CR2 = ((1<<0)|(7<<17)|(1<<20));	//Power on the ADC, Select SWARER as external ecent, enable external trigger mode
+	ADC1->CR2 |= (1<<3);				//Reset Calibration
+	while(ADC1->CR2 & (1<<3));	//Wait until Reset finished
+	
+	ADC1->CR2 |= (1<<2);				//Start Calibration
+	while (ADC1->CR2 & (1<<2));	//Wait until Calibration Finished
+
+	ADC1->CR2 |= (1<<3);				//reset calibration
+	while (ADC1->CR2 & (1<<3));	//wait until reset finished
+	ADC1->CR2 |= (1<<2);				//start calibration 
+	while (ADC1->CR2 & (1<<2));	// wait until calibration finished.
+}
+
+int readADC()
+{
+			int result = 0; 
+			ADC1->CR2 |= (1<<22); 			//retrigger
+			while (!(ADC1->SR & (1<<1))); //wait until EOC
+			//read value and clear (read and clear)
+			result = ADC1->DR;
+			return result;
+}
 // EOF
