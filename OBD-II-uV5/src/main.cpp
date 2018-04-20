@@ -36,7 +36,7 @@ int main(void)
 	GPIO_Config Pin_A[1];
 	Pin_A->Port = GPIO_A;
 	Pin_A->Pin = Pin0;
-	Pin_A->Type = GPIO_Input_PullUpDown;
+	Pin_A->Type = GPIO_Input_Floating;
 	Pin_A->Speed = GPIO_50MHz;
 	
 	// User switch on portB pin 7 
@@ -112,7 +112,7 @@ int main(void)
 	// checked the enable clock for GPIO D 
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
-	configureADC();
+	//configureADC();
   //GPIOControl->enableADC(PER_ADC1, Pin_C4->Port, Pin_C4->Pin , 14);
 	
 	// GPIOControl->enableLabSpecsMode(PER_CAN1,REMAP0);
@@ -125,7 +125,7 @@ int main(void)
 	// Configure can bus clock and all the specs 
 	
   // Main loop
-	int result = readADC();
+	// int result = readADC();
 	unsigned char adcData[4] = "hel";
 	CAN_msg adcMessage[1];
 	adcMessage->id = 0xBADCAFE;
@@ -161,27 +161,29 @@ int main(void)
 			// TODO - Check mailbox
 			// TODO - TX CAN
 			// Send 0x01 to CAN Address 0x01AEFCA
-			// check for the mailbox 
-			
+			// check for the mailbox 			
 			// DEBUG
-			//GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
+			//GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
+			GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		else
 		{
 			// Do nothing if button isn't pressed
 			
 			// DEBUG 
-			//GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
+			//GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
+			GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
+			
 		}
 		
 		// Read Wakeup Button
-		if (!(GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
+		if ((GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
 		{
-			
+			GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		else
 		{
-			
+			GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		delay_software_ms(10);
   }
@@ -299,7 +301,6 @@ void configureADC()
 	RCC->APB2ENR |= 1 << 4;	//Enable GPIOC clock
 	
 	GPIOC->CRL &= ~0x000F0000; 	//PC4 as ADC 14 input
-	GPIOE->CRH = 0x33333333;		//Configure GPIOE LEDS for Output
 		
 	ADC1->SQR1 = 0x00000000;		//Regular Channel 1 Conversion
 	ADC1->SQR2 = 0x00000000;		//Clear Register
