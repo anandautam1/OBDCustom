@@ -128,7 +128,7 @@ int main(void)
 	
 	// Configure can bus clock and all the specs 
 	
-  // Main loop
+  	
 	// int result = readADC();
 	unsigned char adcData[4] = "hel";
 	CAN_msg adcMessage[1];
@@ -160,16 +160,17 @@ int main(void)
 	GLCD_Init();
 	GLCD_Clear(White);
 	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
+	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:")
 	
+  // Main loop
   while (1)
   {
 		
 		int result = readAdc();
-		char AdcLabel = "ADC value = "
+		//char AdcLabel[10] = "ADC value = "
 		char resultChars[10]; 
-		std::sprintf(resultChars,"%c %i",result);
-		GLCD_DisplayString(2, 1, (unsigned char*)resultChars);
-		
+		std::sprintf(resultChars,"%i",result);
+		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
 		
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
@@ -340,11 +341,11 @@ void configureAdc()
 
 int readAdc()
 {
-			int result = 0; 
-			ADC1->CR2 |= (1<<22); 			//retrigger
-			while (!(ADC1->SR & (1<<1))); //wait until EOC
-			//read value and clear (read and clear)
-			result = ADC1->DR;
-			return result;
+	int result = 0; 
+	ADC1->CR2 |= (1<<22); 			//retrigger
+	while (!(ADC1->SR & (1<<1))); //wait until EOC
+	//read value and clear (read and clear)
+	result = ADC1->DR;
+	return result;
 }
 // EOF
