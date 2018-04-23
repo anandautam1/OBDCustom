@@ -61,6 +61,7 @@ int main(void)
 	
 	
 	// CAN bus mode RX and TX on PortD pin 0 and 1
+	/*
 	GPIO_Config Pin_D0[1];
 	Pin_D0->Port = GPIO_D;
 	Pin_D0->Pin = Pin0;
@@ -72,6 +73,7 @@ int main(void)
 	Pin_D1->Pin = Pin1;
 	Pin_D1->Type = GPIO_AF_PushPull;
 	Pin_D1->Speed = GPIO_50MHz;
+	*/
 	
 	
 	// LED Output mode on portE pin 8 and 9 
@@ -139,7 +141,7 @@ int main(void)
 	CAN_msg led9Message[1];
 	led9Message->id = 0x0024FCE;
 	for (int i = 0; i < 4; i++) 
-	{led9Message->data[i] = led8Data[i];}
+	{led9Message->data[i] = led9Data[i];}
 	led9Message->len = 4;
 	led9Message->format = STANDARD;
 	led9Message->type = DATA_FRAME;
@@ -162,32 +164,33 @@ int main(void)
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
-			txCAN(led8Message);
+			//txCAN(led8Message);
 			// DEBUG
-			//GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
+			 GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		else
 		{
 			// Do nothing if button isn't pressed
-			
+			//txCAN(led8Message);
 			// DEBUG 
-			// GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
+			 GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		
 		// Read Wakeup Button
 		if ((GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
 		{
-			txCAN(led9Message);
+			//txCAN(led9Message);
 			// DEBUG
-			// GPIOControl->setGPIO(Pin_E9->Port,Pin_E8->Pin);
+			 GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		else
 		{
+			//txCAN(led9Message);
 			// DEBUG 
-			// GPIOControl->resetGPIO(Pin_E9->Port,Pin_E8->Pin);
+			 GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		// deafult is to send the adc value of the trimpot regardless 
-		delay_software_ms(10);
+		//delay_software_ms(10);
   }
 } 
 
