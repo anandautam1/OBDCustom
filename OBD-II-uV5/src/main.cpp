@@ -15,7 +15,7 @@ void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataP
 void configureAdc();
 int readAdc();
 
-void txCAN(int ADDR, int DATA);
+void txCAN(CAN_msg *finalMessage);
 void canTransmissionUniversal(CAN_msg *finalmessage, int mailboxNo);
 int checkMailbox();
 // TODO - prototype for RX DATA data
@@ -162,10 +162,7 @@ int main(void)
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
-			// TODO - Check mailbox
-			// TODO - TX CAN
-			// Send 0x01 to CAN Address 0x01AEFCA
-			// check for the mailbox 			
+			txCAN(led8Message);
 			// DEBUG
 			//GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
@@ -180,16 +177,16 @@ int main(void)
 		// Read Wakeup Button
 		if ((GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
 		{
+			txCAN(led9Message);
 			// DEBUG
-			// GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
+			// GPIOControl->setGPIO(Pin_E9->Port,Pin_E8->Pin);
 		}
 		else
 		{
 			// DEBUG 
-			// GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
+			// GPIOControl->resetGPIO(Pin_E9->Port,Pin_E8->Pin);
 		}
 		// deafult is to send the adc value of the trimpot regardless 
-		
 		delay_software_ms(10);
   }
 } 
@@ -239,23 +236,15 @@ void initializeLabSpecs()
 
 void txCAN(CAN_msg *finalMessage)
 {
+	// need to be enabled when performing sending 
+	// CAN_TIxR rCAN_TI1R;
 	// need to be enabled first 
-	CAN_TDTxR rCAN_TDT1R;
-	
+	// CAN_TDTxR rCAN_TDT1R;
 	// mailbox registers
 	// low bit 
-	CAN_TDLxR rCAN_TDL1R;
+	// CAN_TDLxR rCAN_TDL1R;
 	// high bit
-	CAN_TDHxR rCAN_TDH1R;
-	
-	// need to be enabled when performing sending 
-	CAN_TIxR rCAN_TI1R;
-	
-	//rCAN_TI1R.
-	
-	// check for any available empty mailbox to transmit data into; 
-	// there are three tx mailbox 
-	// there are two rx mailbox 
+	// CAN_TDHxR rCAN_TDH1R;
 	
 	int mailbox_no = checkMailbox(); 
 	if(mailbox_no == 0 || mailbox_no == 1 || mailbox_no == 2)
@@ -298,6 +287,10 @@ int checkMailbox()
 
 void canTransmissionUniversal(CAN_msg *finalMessage, int mailboxNo)
 {
+		if(mailboxNo > 2 || mailboxNo < 0)
+		{
+			return;
+		}
 		CAN1->sTxMailBox[mailboxNo].TIR  = (unsigned int)(finalMessage->id << 3) | 4; 
 		int temp = DATA_FRAME;
 		if (finalMessage->type == temp){								// DATA FRAME
