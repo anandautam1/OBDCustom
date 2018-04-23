@@ -62,7 +62,7 @@ int main(void)
 	
 	
 	// CAN bus mode RX and TX on PortD pin 0 and 1
-	
+	/*
 	GPIO_Config Pin_D0[1];
 	Pin_D0->Port = GPIO_D;
 	Pin_D0->Pin = Pin0;
@@ -74,6 +74,7 @@ int main(void)
 	Pin_D1->Pin = Pin1;
 	Pin_D1->Type = GPIO_Output_PushPull;
 	Pin_D1->Speed = GPIO_50MHz;
+	*/
 	
 	
 	// LED Output mode on portE pin 8 and 9 
@@ -125,10 +126,8 @@ int main(void)
 	
 	initializeLabSpecs();
 
-	//configureAdc();
-  //GPIOControl->enableADC(PER_ADC1, Pin_C4->Port, Pin_C4->Pin , 14);
-	
-	// int result = readADC();
+	configureAdc();
+  
 	unsigned char adcData[4] = "hel";
 	CAN_msg adcMessage[1];
 	adcMessage->id = 0xBADCAFE;
@@ -147,7 +146,7 @@ int main(void)
 	led8Message->format = STANDARD;
 	led8Message->type = DATA_FRAME;
 	
-	unsigned char led9Data[4] = "wor";
+	unsigned char led9Data[4] = "ana";
 	CAN_msg led9Message[1];
 	led9Message->id = 0x0024FCE;
 	for (int i = 0; i < 4; i++) 
@@ -156,20 +155,20 @@ int main(void)
 	led9Message->format = STANDARD;
 	led9Message->type = DATA_FRAME;
 	
-	//GLCD_Init();
-	//GLCD_Clear(White);
-	//GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
-	//GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
+	GLCD_Init();
+	GLCD_Clear(White);
+	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
+	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
 	
   // Main loop
   while (1)
   {
 		
-		//int result = readAdc();
+		int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
 		char resultChars[10]; 
-		//std::sprintf(resultChars,"%i",result);
-		//GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
+		std::sprintf(resultChars,"%i",result);
+		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
 		
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
@@ -200,7 +199,9 @@ int main(void)
 			 GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		// deafult is to send the adc value of the trimpot regardless 
-		//delay_software_ms(10);
+		txCAN(adcMessage);
+		// needed for the 5Hz update rate 
+		delay_software_ms(50);
   }
 } 
 
@@ -216,35 +217,79 @@ void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataP
 void initializeLabSpecs()
 {
 	// delacre the variable register with the offset 
-	CAN_MCR rCAN1_MCR;
-	CAN_MSR rCAN1_MSR;
+	volatile CAN_MCR rCAN1_MCR;
+	volatile CAN_MSR rCAN1_MSR;
 	
 	CAN_BTR rCAN1_BTR;
-	CAN_TSR rCAN1_TSR;
+	
+	//CAN_TSR rCAN1_TSR;
 	// end of definition 
 	
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-	// initialize the bit 
-	rCAN1_MCR.b.binrq = 1;
-	// set to 1 even if packet error occurs 
-	rCAN1_MCR.b.bnart = 1;
-	// set reset to 1 to check if the periperhals has been resetted 
 	rCAN1_MCR.b.breset = 1;
-	// exit the sleep mode 
-	rCAN1_MCR.b.bsleep = 0;
 	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
 	
 	// what till the MCR has been free
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-	while(rCAN1_MCR.b.breset)
+	while(rCAN1_MCR.b.breset == 1)
 	{
 		rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+		// timeout is less than x 
 	}
-	 
+	
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	// initialize the bit 
+	rCAN1_MCR.b.binrq = 1;
+	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
+	
+	// reat the init
+	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+	while(rCAN1_MSR.b.binak == 0)
+	{
+		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+		// timeout is less than x 
+	}
+	
+	// set the timing register 
+	rCAN1_BTR.d32 = readRegister(RCAN1_BTR); 
+	
+	// BTR bit timing register
+	// loopback mode 
 	// the apbr1 default clock is 36MHz 
 	// bit field 8 brp set to 8 ... 
-	rCAN1_BTR.b.bbrp = 8;
+	// resynchronization 
+	rCAN1_BTR.b.bsjw = 0x02;
+	// time segment 2
+	rCAN1_BTR.b.bts2 = 0x02;
+	// time segment 1 
+	rCAN1_BTR.b.bts1 = 0x0B;
+	// set the baud rate 250kHz 
+	rCAN1_BTR.b.bbrp = 0x08;
+	// disable loopback 
+	rCAN1_BTR.b.blbkm = 0;
 	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
+	
+	
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	// set to 1 even if packet error occurs 
+	rCAN1_MCR.b.bnart = 1;
+	writeRegister(RCAN1_MCR, rCAN1_MCR.d32);
+	// set reset to 1 to check if the periperhals has been resetted 
+	// exit the sleep mode 
+	
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	// set to 1 even if packet error occurs 
+	rCAN1_MCR.b.binrq = 0;
+	rCAN1_MCR.b.bsleep = 0;
+	writeRegister(RCAN1_MCR, rCAN1_MCR.d32);
+	
+	// reat the init
+	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+	while(rCAN1_MSR.b.binak == 1)
+	{
+		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+		// timeout is less than x 
+	}
 }
 
 void txCAN(CAN_msg *finalMessage)
