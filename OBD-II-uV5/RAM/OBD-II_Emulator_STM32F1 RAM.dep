@@ -1,5 +1,5 @@
 Dependencies for Project 'OBD-II_Emulator', Target 'STM32F1 RAM': (DO NOT MODIFY !)
-F (.\src\main.cpp)(0x5ADDAD60)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
+F (.\src\main.cpp)(0x5ADD6567)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
 I (.\inc\stm32f10x_it.h)(0x4D997B6E)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
 I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5ACEC210)
@@ -92,7 +92,7 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include\cmsis_armcc.h)(0x5A8E03C2)
 I (.\inc\system_stm32f10x_cl.h)(0x5AD72374)
 I (.\inc\DispCode.h)(0x5AD72354)
 I (.\inc\Font_24x16.h)(0x5AD7235E)
-F (.\canController.cpp)(0x5ADD75B1)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\cancontroller.o --omf_browse .\ram\cancontroller.crf --depend .\ram\cancontroller.d)
+F (.\canController.cpp)(0x5ADD6B61)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\cancontroller.o --omf_browse .\ram\cancontroller.crf --depend .\ram\cancontroller.d)
 I (canController.h)(0x5ADD6A16)
 I (.\inc\canRegisters.h)(0x5ADD42D0)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
