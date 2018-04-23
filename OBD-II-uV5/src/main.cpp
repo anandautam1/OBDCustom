@@ -16,6 +16,8 @@ void configureAdc();
 int readAdc();
 
 void txCAN(int ADDR, int DATA);
+void canTransmissionUniversal(CAN_msg *finalmessage, int mailboxNo);
+int checkMailbox();
 // TODO - prototype for RX DATA data
 // int rxCAN();
 
@@ -34,7 +36,7 @@ int main(void)
 	
 	// Wakeup swtich on portA pin 0
 	
-	//rCAN_TSR.d32 = readRegister((unsigned int *)CAN1_BASE_ADDR + RCAN_TSR);
+	// rCAN_TSR.d32 = readRegister((unsigned int *)CAN1_BASE_ADDR + RCAN_TSR);
 	
 	// Wakeup switch on portA pin 0
 	GPIO_Config Pin_A[1];
@@ -100,11 +102,6 @@ int main(void)
 	GPIOControl->configureGPIO(Pin_C4);
 	GPIOControl->setGPIO(Pin_C4->Port, Pin_C4->Pin);
 	
-	//GPIOControl->configureGPIO(Pin_D0);
-	//GPIOControl->setGPIO(Pin_D0->Port, Pin_D0->Pin);
-	//GPIOControl->configureGPIO(Pin_D1);
-	//GPIOControl->setGPIO(Pin_D1->Port, Pin_D1->Pin);
-	
 	GPIOControl->configureGPIO(Pin_E8);
 	GPIOControl->setGPIO(Pin_E8->Port, Pin_E8->Pin);	
 	GPIOControl->configureGPIO(Pin_E9);
@@ -119,16 +116,6 @@ int main(void)
 	configureAdc();
   //GPIOControl->enableADC(PER_ADC1, Pin_C4->Port, Pin_C4->Pin , 14);
 	
-	// GPIOControl->enableLabSpecsMode(PER_CAN1,REMAP0);
-	
-	// configure the switch 
-	
-	// configure the adc 
-	// RCCControl->enablePeriperhal(RCC_CAN1);
-	
-	// Configure can bus clock and all the specs 
-	
-  	
 	// int result = readADC();
 	unsigned char adcData[4] = "hel";
 	CAN_msg adcMessage[1];
@@ -160,7 +147,7 @@ int main(void)
 	GLCD_Init();
 	GLCD_Clear(White);
 	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
-	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:")
+	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
 	
   // Main loop
   while (1)
@@ -181,27 +168,28 @@ int main(void)
 			// check for the mailbox 			
 			// DEBUG
 			//GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
-			GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		else
 		{
 			// Do nothing if button isn't pressed
 			
 			// DEBUG 
-			//GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
-			GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
-			
+			// GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		
 		// Read Wakeup Button
 		if ((GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
 		{
-			GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
+			// DEBUG
+			// GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		else
 		{
-			GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
+			// DEBUG 
+			// GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
+		// deafult is to send the adc value of the trimpot regardless 
+		
 		delay_software_ms(10);
   }
 } 
@@ -265,27 +253,72 @@ void txCAN(CAN_msg *finalMessage)
 	
 	//rCAN_TI1R.
 	
-	CAN1->sTxMailBox[0].TIR  = (unsigned int)(finalMessage->id << 3) | 4; 
-	int temp = DATA_FRAME;
-	if (finalMessage->type == temp){								// DATA FRAME
-		CAN1->sTxMailBox[0].TIR &= ~(1<<1);
-	}
-	// REMOTE FRAME
-	else{
-		CAN1->sTxMailBox[0].TIR |= 1<<1;
-	}
-  CAN1->sTxMailBox[0].TDLR = (((unsigned int)finalMessage->data[3] << 24) | 
-                             ((unsigned int)finalMessage->data[2] << 16) |
-                             ((unsigned int)finalMessage->data[1] <<  8) | 
-                             ((unsigned int)finalMessage->data[0])        );
-  CAN1->sTxMailBox[0].TDHR = (((unsigned int)finalMessage->data[7] << 24) | 
-                             ((unsigned int)finalMessage->data[6] << 16) |
-                             ((unsigned int)finalMessage->data[5] <<  8) |
-                             ((unsigned int)finalMessage->data[4])        );
-  CAN1->sTxMailBox[0].TDTR &= ~0xf; // Setup length
-  CAN1->sTxMailBox[0].TDTR |=  (finalMessage->len & 0xf);
-  CAN1->sTxMailBox[0].TIR |=  1;                     // transmit message
+	// check for any available empty mailbox to transmit data into; 
+	// there are three tx mailbox 
+	// there are two rx mailbox 
 	
+	int mailbox_no = checkMailbox(); 
+	if(mailbox_no == 0 || mailbox_no == 1 || mailbox_no == 2)
+	{
+		canTransmissionUniversal(finalMessage,mailbox_no);
+		return;
+	}
+	if(mailbox_no == -1)
+	{
+		// there are no free mailbox just
+		GLCD_DisplayString(4, 1, (unsigned char*)"MAILBOX FULL");
+		return;
+	}
+}
+
+int checkMailbox()
+{
+	// determine free mailbox put mailbox_no as argument 
+	CAN_TSR rCAN1_TSR;
+	rCAN1_TSR.d32 = readRegister(RCAN1_TSR);
+	// on the CAN_TSR do the following 
+	// check tsr on TME2 , TME1 , TME0 on set (high) when there are not transmission 
+	if(rCAN1_TSR.b.btme0 == 1)
+	{
+		return 0;
+	}
+	if(rCAN1_TSR.b.btme1 == 1)
+	{
+		return 1;
+	}
+	if(rCAN1_TSR.b.btme2 == 1)
+	{
+		return 2;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+void canTransmissionUniversal(CAN_msg *finalMessage, int mailboxNo)
+{
+		CAN1->sTxMailBox[mailboxNo].TIR  = (unsigned int)(finalMessage->id << 3) | 4; 
+		int temp = DATA_FRAME;
+		if (finalMessage->type == temp){								// DATA FRAME
+			CAN1->sTxMailBox[mailboxNo].TIR &= ~(1<<1);
+		}
+		// REMOTE FRAME
+		else{
+			CAN1->sTxMailBox[mailboxNo].TIR |= 1<<1;
+		}
+		CAN1->sTxMailBox[mailboxNo].TDLR = (((unsigned int)finalMessage->data[3] << 24) | 
+															 ((unsigned int)finalMessage->data[2] << 16) |
+															 ((unsigned int)finalMessage->data[1] <<  8) | 
+															 ((unsigned int)finalMessage->data[0])        );
+		CAN1->sTxMailBox[mailboxNo].TDHR = (((unsigned int)finalMessage->data[7] << 24) | 
+															 ((unsigned int)finalMessage->data[6] << 16) |
+															 ((unsigned int)finalMessage->data[5] <<  8) |
+															 ((unsigned int)finalMessage->data[4])        );
+															 
+		CAN1->sTxMailBox[mailboxNo].TDTR &= ~0xf; // Setup length
+		CAN1->sTxMailBox[mailboxNo].TDTR |=  (finalMessage->len & 0xf);
+		CAN1->sTxMailBox[mailboxNo].TIR |=  1;                     // transmit message
 }
 
 void toggle_led(int LED)
@@ -314,6 +347,7 @@ void toggle_led(int LED)
 
 void configureAdc()
 {
+	// Non urgent (to have the register config based on the class created)
 	RCC->APB2ENR |= 1 << 9; //Enable ADC clock
 	RCC->APB2ENR |= 1 << 4;	//Enable GPIOC clock
 	
@@ -324,9 +358,8 @@ void configureAdc()
 	ADC1->SQR3 = (14<<0);				//SQ1 = Channel 14
 	ADC1->SMPR1 = (5<<12);			//SAmple TIme Channel 14, 55, 5 cycles
 	
-	//ADC1->CR1 = (1<<8);				//Scan mode on
-
-	ADC1->CR2 = ((1<<0)|(7<<17)|(1<<20));	//Power on the ADC, Select SWARER as external ecent, enable external trigger mode
+	//Power on the ADC, Select SWARER as external ecent, enable external trigger mode
+	ADC1->CR2 = ((1<<0)|(7<<17)|(1<<20));	
 	ADC1->CR2 |= (1<<3);				//Reset Calibration
 	while(ADC1->CR2 & (1<<3));	//Wait until Reset finished
 	
@@ -348,4 +381,5 @@ int readAdc()
 	result = ADC1->DR;
 	return result;
 }
+
 // EOF
