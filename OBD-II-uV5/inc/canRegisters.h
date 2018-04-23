@@ -12,48 +12,48 @@
 
 #define CAN1_BASE_ADDR											0x40006400		
 #define CAN2_BASE_ADDR											0x40006800		
-#define CAN_RAM															0x40006000
+#define CAN_RAM													0x40006000
 
 
-#define	CAN_OFFSET													0x400
-#define CAN_FILTER													28
+#define	CAN_OFFSET												0x400
+#define CAN_FILTER												28
 #define CAN_FILTER_OFFSET										0x08
 
 // Define the register offsets.
-#define RCAN_MCR														0x00
-#define RCAN_MSR														0x04
-#define RCAN_TSR														0x08
-#define RCAN_RF0R														0x0C
-#define RCAN_RF1R														0x10
-#define RCAN_IER														0x14
-#define RCAN_ESR														0x18
-#define RCAN_BTR														0x1C
-#define RCAN_TI0R														0x180
-#define RCAN_TDT0R													0x184
-#define RCAN_TDL0R													0x188
-#define RCAN_TDH0R													0x18C
-#define RCAN_TI1R												 		0x190
-#define RCAN_TDT1R													0x194
-#define RCAN_TDL1R													0x198
-#define RCAN_TDH1R													0x19C
-#define RCAN_TI2R														0x1A0
-#define RCAN_TDT2R													0x1A4
-#define RCAN_TDL2R											 		0x1A8
-#define RCAN_TDH2R													0x1AC
-#define RCAN_RI0R														0x1B0
-#define RCAN_RDT0R													0x1B4
-#define RCAN_RDL0R													0x1B8
-#define RCAN_RHD0R													0x1BC
-#define RCAN_RI1R														0x1C0
-#define RCAN_RDT1R													0x1C4
-#define RCAN_RDL1R													0x1C8
-#define RCAN_RHD1R													0x1CC
+#define RCAN_MCR													(unsigned int *) (CAN1_BASE_ADDR + 0x00)
+#define RCAN_MSR													(unsigned int *) (CAN1_BASE_ADDR + 0x04)
+#define RCAN_TSR													(unsigned int *) (CAN1_BASE_ADDR + 0x08)
+#define RCAN_RF0R													(unsigned int *) (CAN1_BASE_ADDR + 0x0C)
+#define RCAN_RF1R													(unsigned int *) (CAN1_BASE_ADDR + 0x10)
+#define RCAN_IER													(unsigned int *) (CAN1_BASE_ADDR + 0x14)
+#define RCAN_ESR													(unsigned int *) (CAN1_BASE_ADDR + 0x18)
+#define RCAN_BTR													(unsigned int *) (CAN1_BASE_ADDR + 0x1C)
+#define RCAN_TI0R													(unsigned int *) (CAN1_BASE_ADDR + 0x180)
+#define RCAN_TDT0R													(unsigned int *) (CAN1_BASE_ADDR + 0x184)
+#define RCAN_TDL0R													(unsigned int *) (CAN1_BASE_ADDR + 0x188)
+#define RCAN_TDH0R													(unsigned int *) (CAN1_BASE_ADDR + 0x18C)
+#define RCAN_TI1R												 	(unsigned int *) (CAN1_BASE_ADDR + 0x190)
+#define RCAN_TDT1R													(unsigned int *) (CAN1_BASE_ADDR + 0x194)
+#define RCAN_TDL1R													(unsigned int *) (CAN1_BASE_ADDR + 0x198)
+#define RCAN_TDH1R													(unsigned int *) (CAN1_BASE_ADDR + 0x19C)
+#define RCAN_TI2R													(unsigned int *) (CAN1_BASE_ADDR + 0x1A0)
+#define RCAN_TDT2R													(unsigned int *) (CAN1_BASE_ADDR + 0x1A4)
+#define RCAN_TDL2R											 		(unsigned int *) (CAN1_BASE_ADDR + 0x1A8)
+#define RCAN_TDH2R													(unsigned int *) (CAN1_BASE_ADDR + 0x1AC)
+#define RCAN_RI0R													(unsigned int *) (CAN1_BASE_ADDR + 0x1B0)
+#define RCAN_RDT0R													(unsigned int *) (CAN1_BASE_ADDR + 0x1B4)
+#define RCAN_RDL0R													(unsigned int *) (CAN1_BASE_ADDR + 0x1B8)
+#define RCAN_RHD0R													(unsigned int *) (CAN1_BASE_ADDR + 0x1BC)
+#define RCAN_RI1R													(unsigned int *) (CAN1_BASE_ADDR + 0x1C0)
+#define RCAN_RDT1R													(unsigned int *) (CAN1_BASE_ADDR + 0x1C4)
+#define RCAN_RDL1R													(unsigned int *) (CAN1_BASE_ADDR + 0x1C8)
+#define RCAN_RHD1R													(unsigned int *) (CAN1_BASE_ADDR + 0x1CC)
 
 // Registers below an offset of 0x200 only exist for CAN1
 #define RCAN_FMR														0x200
 #define RCAN_FM1R														0x204
 #define RCAN_FS1R														0x20C
-#define RCAN_FFA1R													0x214
+#define RCAN_FFA1R														0x214
 #define RCAN_FA1R														0x21C
 #define RCAN_F0R1														0x240
 #define RCAN_F0R2														0x244

@@ -1,14 +1,26 @@
+/* ===============================================================================
+// Includes
+================================================================================*/
+
 #include "stm32f10x_it.h"
 #include "RCCController.h"
 #include "GPIOController.h"
 #include "utility.h"
 #include "canRegisters.h"
+#include "canController.h"
 #include "DispCode.h"
 
 //#include <iostream>
 #include <string>
 
+/* ===============================================================================
+// Definitions
+================================================================================*/
+//#define LAB_HARDWARE 	// Defined in utility.h
+
+/* ===============================================================================
 // Function Prototypes
+================================================================================*/
 
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket);
@@ -23,12 +35,9 @@ int checkMailbox();
 
 void toggle_led(int LED);
 
-//******************************************************************************//
-// Function: main()
-// Input : None
-// Return : None
-// Description : Entry point into the application.
-// *****************************************************************************//
+/* ===============================================================================
+// Main
+================================================================================*/
 int main(void)
 {
 	// maybe instances can be created as an array .... 
@@ -115,7 +124,10 @@ int main(void)
 	// checked the enable clock for GPIO D 
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
+
+#ifdef LAB_HARDWARE
 	configureAdc();
+
   //GPIOControl->enableADC(PER_ADC1, Pin_C4->Port, Pin_C4->Pin , 14);
 	
 	// int result = readADC();
@@ -127,6 +139,7 @@ int main(void)
 	adcMessage->len = 4;
 	adcMessage->format = STANDARD;
 	adcMessage->type = DATA_FRAME;
+#endif
 	
 	unsigned char led8Data[4] = "wor";
 	CAN_msg led8Message[1];
@@ -146,20 +159,28 @@ int main(void)
 	led9Message->format = STANDARD;
 	led9Message->type = DATA_FRAME;
 	
+	// CAN Setup
+	canInit();
+
+#ifdef LAB_HARDWARE
+	// LCD Code
 	GLCD_Init();
 	GLCD_Clear(White);
 	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
 	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
+#endif
 	
   // Main loop
   while (1)
   {
-		
+
+		#ifdef LAB_HARDWARE
 		int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
 		char resultChars[10]; 
 		std::sprintf(resultChars,"%i",result);
 		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
+		#endif
 		
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
@@ -194,8 +215,10 @@ int main(void)
   }
 } 
 
-
+/* ===============================================================================
 // Function Definitions
+================================================================================*/
+
 unsigned int readRegister(volatile unsigned int * iregisterAddress){
 	return (*iregisterAddress);
 }
@@ -341,6 +364,8 @@ void toggle_led(int LED)
 	}	
 }
 
+#ifdef LAB_HARDWARE
+
 void configureAdc()
 {
 	// Non urgent (to have the register config based on the class created)
@@ -377,5 +402,7 @@ int readAdc()
 	result = ADC1->DR;
 	return result;
 }
+
+#endif
 
 // EOF

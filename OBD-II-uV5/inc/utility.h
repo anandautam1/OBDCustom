@@ -5,5 +5,7 @@
 *			Header File														*
 ********************************************/
 
+// #define LAB_HARDWARE		// Use this to adjust code for hardware / simulation
+
 void delay_software_us(unsigned int);					// Crude software delay (in microseconds)
 void delay_software_ms(unsigned int);					// Crude software delay (in microseconds)
