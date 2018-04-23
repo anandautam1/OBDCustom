@@ -15,6 +15,7 @@ void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataP
 void configureAdc();
 int readAdc();
 
+void initializeLabSpecs();
 void txCAN(CAN_msg *finalMessage);
 void canTransmissionUniversal(CAN_msg *finalmessage, int mailboxNo);
 int checkMailbox();
@@ -61,19 +62,18 @@ int main(void)
 	
 	
 	// CAN bus mode RX and TX on PortD pin 0 and 1
-	/*
+	
 	GPIO_Config Pin_D0[1];
 	Pin_D0->Port = GPIO_D;
 	Pin_D0->Pin = Pin0;
-	Pin_D0->Type = GPIO_AF_PushPull;
+	Pin_D0->Type = GPIO_Input_PullUpDown;
 	Pin_D0->Speed = GPIO_50MHz;
 
 	GPIO_Config Pin_D1[1];
 	Pin_D1->Port = GPIO_D;
 	Pin_D1->Pin = Pin1;
-	Pin_D1->Type = GPIO_AF_PushPull;
+	Pin_D1->Type = GPIO_Output_PushPull;
 	Pin_D1->Speed = GPIO_50MHz;
-	*/
 	
 	
 	// LED Output mode on portE pin 8 and 9 
@@ -115,7 +115,17 @@ int main(void)
 	// checked the enable clock for GPIO D 
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
-	configureAdc();
+	
+	/*
+	GPIOControl->configureGPIO(Pin_D0);
+	GPIOControl->setGPIO(Pin_D0->Port, Pin_D0->Pin);
+	GPIOControl->configureGPIO(Pin_D1);
+	GPIOControl->setGPIO(Pin_D1->Port, Pin_D1->Pin);
+	*/
+	
+	initializeLabSpecs();
+
+	//configureAdc();
   //GPIOControl->enableADC(PER_ADC1, Pin_C4->Port, Pin_C4->Pin , 14);
 	
 	// int result = readADC();
@@ -146,25 +156,25 @@ int main(void)
 	led9Message->format = STANDARD;
 	led9Message->type = DATA_FRAME;
 	
-	GLCD_Init();
-	GLCD_Clear(White);
-	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
-	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
+	//GLCD_Init();
+	//GLCD_Clear(White);
+	//GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
+	//GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
 	
   // Main loop
   while (1)
   {
 		
-		int result = readAdc();
+		//int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
 		char resultChars[10]; 
-		std::sprintf(resultChars,"%i",result);
-		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
+		//std::sprintf(resultChars,"%i",result);
+		//GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
 		
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
-			//txCAN(led8Message);
+			 txCAN(led8Message);
 			// DEBUG
 			 GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
@@ -179,7 +189,7 @@ int main(void)
 		// Read Wakeup Button
 		if ((GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
 		{
-			//txCAN(led9Message);
+			 txCAN(led9Message);
 			// DEBUG
 			 GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
@@ -213,7 +223,7 @@ void initializeLabSpecs()
 	CAN_TSR rCAN1_TSR;
 	// end of definition 
 	
-	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
 	// initialize the bit 
 	rCAN1_MCR.b.binrq = 1;
 	// set to 1 even if packet error occurs 
@@ -222,13 +232,13 @@ void initializeLabSpecs()
 	rCAN1_MCR.b.breset = 1;
 	// exit the sleep mode 
 	rCAN1_MCR.b.bsleep = 0;
-	writeRegister(RCAN_MCR , rCAN1_MCR.d32);
+	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
 	
 	// what till the MCR has been free
-	rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
 	while(rCAN1_MCR.b.breset)
 	{
-		rCAN1_MCR.d32 = readRegister(RCAN_MCR);
+		rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
 	}
 	 
 	// the apbr1 default clock is 36MHz 
@@ -252,6 +262,7 @@ void txCAN(CAN_msg *finalMessage)
 	int mailbox_no = checkMailbox(); 
 	if(mailbox_no == 0 || mailbox_no == 1 || mailbox_no == 2)
 	{
+		GLCD_DisplayString(4, 1, (unsigned char*)"MAILBOX GOOD");
 		canTransmissionUniversal(finalMessage,mailbox_no);
 		return;
 	}
@@ -296,7 +307,8 @@ void canTransmissionUniversal(CAN_msg *finalMessage, int mailboxNo)
 		}
 		CAN1->sTxMailBox[mailboxNo].TIR  = (unsigned int)(finalMessage->id << 3) | 4; 
 		int temp = DATA_FRAME;
-		if (finalMessage->type == temp){								// DATA FRAME
+		// DATA FRAME
+		if (finalMessage->type == temp){								
 			CAN1->sTxMailBox[mailboxNo].TIR &= ~(1<<1);
 		}
 		// REMOTE FRAME
