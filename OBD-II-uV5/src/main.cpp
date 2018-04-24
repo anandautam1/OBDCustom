@@ -62,7 +62,6 @@ int main(void)
 	
 	
 	// CAN bus mode RX and TX on PortD pin 0 and 1
-	
 	GPIO_Config Pin_D0[1];
 	Pin_D0->Port = GPIO_D;
 	Pin_D0->Pin = Pin0;
@@ -200,6 +199,8 @@ int main(void)
 			 GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		// deafult is to send the adc value of the trimpot regardless 
+		
+		
 		//delay_software_ms(10);
   }
 } 
@@ -232,6 +233,8 @@ void initializeLabSpecs()
 	rCAN1_MCR.b.breset = 1;
 	// exit the sleep mode 
 	rCAN1_MCR.b.bsleep = 0;
+	// Set the CAN mailbox to overwrite old data when it is full
+	rCAN1_MCR.b.brflm = 0;
 	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
 	
 	// what till the MCR has been free
@@ -245,6 +248,70 @@ void initializeLabSpecs()
 	// bit field 8 brp set to 8 ... 
 	rCAN1_BTR.b.bbrp = 8;
 	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
+	
+	// =======================================================
+	// CAN Filter Initialization
+	// =======================================================
+	// Disable CAN reception to set CAN filters
+	CAN_FMR rCAN1_FMR;
+	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
+	rCAN1_FMR.b.bfinit = 1;		// Disable CAN reception
+	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
+	
+	// Activate CAN filters	
+	CAN_FA1R rCAN1_FA1R;
+	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
+	rCAN1_FA1R.b.bfact0 = 1;		// Set filter0 to active
+	rCAN1_FA1R.b.bfact1 = 1;		// Set filter1 to active	
+	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
+	
+	// Set Filter identifier list or identifier mask
+	CAN_FM1R rCAN1_FM1R;
+	rCAN1_FM1R.d32 = readRegister(RCAN1_FM1R);
+	rCAN1_FM1R.b.bfmb0 = 0;	 		// Set filter0 to use identifier mask mode	// TODO - check if this is right
+	rCAN1_FM1R.b.bfmb1 = 1;			// Set filter1 to use identifier list mode	// TODO - check if this is right
+	writeRegister(RCAN1_FM1R, rCAN1_FM1R.d32);
+	
+	// Set Filter scale
+	CAN_FS1R rCAN1_FS1R;
+	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
+	rCAN1_FS1R.b.bfsc0 = 0;		// TODO - check if this is right
+	rCAN1_FS1R.b.bfsc1 = 0;		// TODO - check if this is right
+	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
+
+	// Setup Filter Bank 0 Pair
+	CAN_FiRx rCAN1_F0R1;
+	CAN_FiRx rCAN1_F0R2;	
+	rCAN1_F0R1.d32 = readRegister(RCAN1_F0R1);
+	rCAN1_F0R2.d32 = readRegister(RCAN1_F0R2);
+	rCAN1_F0R1.b.bfb = 0;		// TODO - set filter mask
+	rCAN1_F0R2.b.bfb = 0;		// TODO - set filter mask
+	writeRegister(RCAN1_F0R1, rCAN1_F0R1.d32);
+	writeRegister(RCAN1_F0R2, rCAN1_F0R2.d32);
+	
+	// Setup Filter Bank 1 Pair
+	CAN_FiRx rCAN1_F1R1;
+	CAN_FiRx rCAN1_F1R2;	
+	rCAN1_F1R1.d32 = readRegister(RCAN1_F1R1);
+	rCAN1_F1R2.d32 = readRegister(RCAN1_F1R2);
+	rCAN1_F1R1.b.bfb = 0;		// TODO - set filter mask
+	rCAN1_F1R2.b.bfb = 0;		// TODO - set filter mask
+	writeRegister(RCAN1_F1R1, rCAN1_F1R1.d32);
+	writeRegister(RCAN1_F1R2, rCAN1_F1R2.d32);
+
+	// Set FIFO destination for each filter
+	CAN_FFA1R rCAN1_FFA1R;
+	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
+	rCAN1_FFA1R.b.bffa0 = 0;		// Set filter0 to send message to FIFO0
+	rCAN1_FFA1R.b.bffa1 = 1;		// Set filter1 to send message to FIFO1
+	writeRegister(RCAN1_FFA1R, rCAN1_FFA1R.d32);
+
+	// Enable CAN reception now that filters are setup
+	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
+	rCAN1_FMR.b.bfinit = 0;	// Enable CAN reception
+	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
+	
+	
 }
 
 void txCAN(CAN_msg *finalMessage)
@@ -272,6 +339,39 @@ void txCAN(CAN_msg *finalMessage)
 		GLCD_DisplayString(4, 1, (unsigned char*)"MAILBOX FULL");
 		return;
 	}
+}
+
+void rxCAN(void)
+{
+	// Check FIFO output mailbox
+	
+	// Read FIFO mailbox contents
+	
+	// Release FIFo mailbox by setting the RFOM bit in the CAN FRF register
+	CAN_RF0R rCAN1_RF0R;	// TODO 
+	rCAN1_RF0R.d32 = readRegister(RCAN_RF0R);
+	rCAN1_RF0R.b.brfom0 = 1;
+	
+	
+	// if FIFO is full and a new message has been received
+		// Clear FOVR0 bit;
+	
+	// if FIFO is full 
+		// FULL0 will be set
+		// FULL0 needs to be cleared by software
+	
+	writeRegister(RCAN_RF0R, rCAN1_RF0R.d32);
+	
+	// TODO - Repeat above code for FIFO 1
+	
+	// FIFO is now empty again
+	
+	// if another message is received, it goes into pending_2 (FMP = 0x10, CAN_RFR FOVR = 0), then pending_3 (FMP = 0x11, CAN_RFR FOVR = 0).
+	// if mailbox is full (CAN_RFR FOVR = 1) and a message has been lost\
+	
+	
+	// if 
+
 }
 
 int checkMailbox()
