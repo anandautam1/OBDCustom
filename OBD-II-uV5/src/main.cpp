@@ -8,19 +8,33 @@
 //#include <iostream>
 #include <string>
 
-// Function Prototypes
+//#define Id0 0xBADCAFE
+#define Id1 0x01A4F2B
+#define Id2 0x0024FcE
 
+#define STANDARD_FORMAT  0
+#define EXTENDED_FORMAT  1
+
+// Function Prototypes
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket);
 void configureAdc();
 int readAdc();
 
+void initializeCanFilters();
+void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type);
+
 void initializeLabSpecs();
 void txCAN(CAN_msg *finalMessage);
 void canTransmissionUniversal(CAN_msg *finalmessage, int mailboxNo);
-int checkMailbox();
+int checkTxMailbox();
 // TODO - prototype for RX DATA data
 // int rxCAN();
+
+typedef union{
+	int integer;
+	unsigned char bytes[4];
+}RESULT;
 
 void toggle_led(int LED);
 
@@ -127,16 +141,7 @@ int main(void)
 	initializeLabSpecs();
 
 	configureAdc();
-  
-	unsigned char adcData[4] = "hel";
-	CAN_msg adcMessage[1];
-	adcMessage->id = 0xBADCAFE;
-	for (int i = 0; i < 4; i++) 
-	{adcMessage->data[i] = adcData[i];}
-	adcMessage->len = 4;
-	adcMessage->format = STANDARD;
-	adcMessage->type = DATA_FRAME;
-	
+
 	unsigned char led8Data[4] = "wor";
 	CAN_msg led8Message[1];
 	led8Message->id = 0x01A4F2B;
@@ -166,9 +171,10 @@ int main(void)
 		
 		int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
-		char resultChars[10]; 
-		std::sprintf(resultChars,"%i",result);
+		char resultChars[20]; 
+		std::sprintf(resultChars,"%i  ",result);
 		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
+		
 		
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
@@ -199,6 +205,21 @@ int main(void)
 			 GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		// deafult is to send the adc value of the trimpot regardless 
+		
+		RESULT adcData;
+		adcData.integer = result;
+		
+		// if data 0E34
+		// on graph its 340E but read 0E34
+		
+		CAN_msg adcMessage[1];
+		adcMessage->id = 0xBADCAFE;
+		for (int i = 0; i < 4; i++) 
+		{adcMessage->data[i] = adcData.bytes[i];}
+		adcMessage->len = 4;
+		adcMessage->format = STANDARD;
+		adcMessage->type = DATA_FRAME;
+		
 		txCAN(adcMessage);
 		// needed for the 5Hz update rate 
 		delay_software_ms(50);
@@ -213,6 +234,79 @@ unsigned int readRegister(volatile unsigned int * iregisterAddress){
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket){
 	*iregisterAddress = idataPacket;
 }
+
+void initializeCanFilters()
+{
+	// enable initialziation mode 
+	CAN_FMR rCAN1_FMR;
+	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
+	rCAN1_FMR.b.bfinit = 1;
+	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
+	
+	// filter initialization
+	CAN_wrFilter(Id1, STANDARD_FORMAT, 0);
+	CAN_wrFilter(Id2, STANDARD_FORMAT, 0);
+	
+	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
+	rCAN1_FMR.d32 &= ~1;
+	writeRegister(RCAN1_FMR,rCAN1_FMR.d32);
+}
+
+void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type)  {
+	
+	static unsigned short CAN_filterIdx = 0;
+         unsigned int   CAN_msgId     = 0;
+	
+	if (CAN_filterIdx > 13) {                       // check if Filter Memory is full
+    return;
+  }
+	
+  // Setup identifier information
+  if (format == STANDARD_FORMAT)  {               // Standard ID
+      CAN_msgId  |= (unsigned int)(id << 21) | 0; //CAN_ID_STD;
+  }  else  {                                      // Extended ID
+      CAN_msgId  |= (unsigned int)(id <<  3) | 4; //CAN_ID_EXT;
+  }
+  if (mess_type == 1)	CAN_msgId  |= 2;
+
+	CAN_FA1R rCAN1_FA1R;
+	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
+	rCAN1_FA1R.d32 &= ~(unsigned int) (1 << CAN_filterIdx);
+	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
+	
+  // initialize filter
+	// set 32-bit scale configuration
+	CAN_FS1R rCAN1_FS1R;
+	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
+	rCAN1_FS1R.d32 |= (unsigned int) (1 << CAN_filterIdx);
+	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
+	
+	// set 2 32-bit identifier list mode
+	CAN_FM1R rCAN1_FM1R;
+	rCAN1_FM1R.d32 = readRegister(RCAN1_FM1R);
+	rCAN1_FM1R.d32 |= (unsigned int)(1 << CAN_filterIdx);
+  writeRegister(RCAN1_FM1R, rCAN1_FM1R.d32);
+
+	// not sure on how to use the classes for the array register access on the register better best to leave it 
+  CAN1->sFilterRegister[CAN_filterIdx].FR1 = CAN_msgId; //  32-bit identifier
+  CAN1->sFilterRegister[CAN_filterIdx].FR2 = CAN_msgId; //  32-bit identifier
+    													   
+	// assign filter to FIFO 0
+	CAN_FFA1R rCAN1_FFA1R;
+	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
+	rCAN1_FFA1R.d32 &= ~(unsigned int)(1 << CAN_filterIdx); 
+	writeRegister(RCAN1_FFA1R, rCAN1_FFA1R.d32);
+	
+	// activate filter
+	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
+	rCAN1_FA1R.d32 |=  (unsigned int)(1 << CAN_filterIdx);
+	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
+  
+	// increment the static variable for any instanceof a new filter 
+  CAN_filterIdx += 1; 
+}
+
+
 
 void initializeLabSpecs()
 {
@@ -269,7 +363,6 @@ void initializeLabSpecs()
 	rCAN1_BTR.b.blbkm = 0;
 	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
 	
-	
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
 	// set to 1 even if packet error occurs 
 	rCAN1_MCR.b.bnart = 1;
@@ -283,7 +376,7 @@ void initializeLabSpecs()
 	rCAN1_MCR.b.bsleep = 0;
 	writeRegister(RCAN1_MCR, rCAN1_MCR.d32);
 	
-	// reat the init
+	// read the init
 	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
 	while(rCAN1_MSR.b.binak == 1)
 	{
@@ -304,7 +397,7 @@ void txCAN(CAN_msg *finalMessage)
 	// high bit
 	// CAN_TDHxR rCAN_TDH1R;
 	
-	int mailbox_no = checkMailbox(); 
+	int mailbox_no = checkTxMailbox(); 
 	if(mailbox_no == 0 || mailbox_no == 1 || mailbox_no == 2)
 	{
 		GLCD_DisplayString(4, 1, (unsigned char*)"MAILBOX GOOD");
@@ -319,7 +412,7 @@ void txCAN(CAN_msg *finalMessage)
 	}
 }
 
-int checkMailbox()
+int checkTxMailbox()
 {
 	// determine free mailbox put mailbox_no as argument 
 	CAN_TSR rCAN1_TSR;
@@ -414,7 +507,7 @@ void configureAdc()
 	//Power on the ADC, Select SWARER as external ecent, enable external trigger mode
 	ADC1->CR2 = ((1<<0)|(7<<17)|(1<<20));	
 	ADC1->CR2 |= (1<<3);				//Reset Calibration
-	while(ADC1->CR2 & (1<<3));	//Wait until Reset finished
+	while (ADC1->CR2 & (1<<3));	//Wait until Reset finished
 	
 	ADC1->CR2 |= (1<<2);				//Start Calibration
 	while (ADC1->CR2 & (1<<2));	//Wait until Calibration Finished

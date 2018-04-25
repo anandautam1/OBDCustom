@@ -7,7 +7,7 @@ void canInit()
 {
 	// setup the GPIO and AFIO 
 	RCC_APB1ENR rAPB1ENR;
-	RCC_APB1RSTR rAPB1RSTR;
+	//RCC_APB1RSTR rAPB1RSTR;
 	
 	// enable the can clocks 
 	rAPB1ENR.d32 = canreadRegister(RRCC_APB1ENR);
