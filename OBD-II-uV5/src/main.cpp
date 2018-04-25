@@ -46,13 +46,6 @@ void toggle_led(int LED);
 // *****************************************************************************//
 int main(void)
 {
-	// maybe instances can be created as an array .... 
-	// but whats the point its just initialization i guess ... 
-	
-	// Wakeup swtich on portA pin 0
-	
-	// rCAN_TSR.d32 = readRegister((unsigned int *)CAN1_BASE_ADDR + RCAN_TSR);
-	
 	// Wakeup switch on portA pin 0
 	GPIO_Config Pin_A[1];
 	Pin_A->Port = GPIO_A;
@@ -73,23 +66,6 @@ int main(void)
 	Pin_C4->Pin = Pin4;
 	Pin_C4->Type = GPIO_Output_PushPull;
 	Pin_C4->Speed = GPIO_Reserved;
-	
-	
-	// CAN bus mode RX and TX on PortD pin 0 and 1
-	/*
-	GPIO_Config Pin_D0[1];
-	Pin_D0->Port = GPIO_D;
-	Pin_D0->Pin = Pin0;
-	Pin_D0->Type = GPIO_Input_PullUpDown;
-	Pin_D0->Speed = GPIO_50MHz;
-
-	GPIO_Config Pin_D1[1];
-	Pin_D1->Port = GPIO_D;
-	Pin_D1->Pin = Pin1;
-	Pin_D1->Type = GPIO_Output_PushPull;
-	Pin_D1->Speed = GPIO_50MHz;
-	*/
-	
 	
 	// LED Output mode on portE pin 8 and 9 
 	GPIO_Config Pin_E8[1];
@@ -130,16 +106,8 @@ int main(void)
 	// checked the enable clock for GPIO D 
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
-	
-	/*
-	GPIOControl->configureGPIO(Pin_D0);
-	GPIOControl->setGPIO(Pin_D0->Port, Pin_D0->Pin);
-	GPIOControl->configureGPIO(Pin_D1);
-	GPIOControl->setGPIO(Pin_D1->Port, Pin_D1->Pin);
-	*/
-	
 	initializeLabSpecs();
-
+	
 	configureAdc();
 
 	unsigned char led8Data[4] = "wor";
@@ -168,14 +136,12 @@ int main(void)
   // Main loop
   while (1)
   {
-		
 		int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
 		char resultChars[20]; 
 		std::sprintf(resultChars,"%i  ",result);
 		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
-		
-		
+	
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
@@ -185,8 +151,6 @@ int main(void)
 		}
 		else
 		{
-			// Do nothing if button isn't pressed
-			//txCAN(led8Message);
 			// DEBUG 
 			 GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
@@ -200,7 +164,6 @@ int main(void)
 		}
 		else
 		{
-			//txCAN(led9Message);
 			// DEBUG 
 			 GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
@@ -305,7 +268,6 @@ void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_typ
 	// increment the static variable for any instanceof a new filter 
   CAN_filterIdx += 1; 
 }
-
 
 
 void initializeLabSpecs()
@@ -465,30 +427,6 @@ void canTransmissionUniversal(CAN_msg *finalMessage, int mailboxNo)
 		CAN1->sTxMailBox[mailboxNo].TDTR &= ~0xf; // Setup length
 		CAN1->sTxMailBox[mailboxNo].TDTR |=  (finalMessage->len & 0xf);
 		CAN1->sTxMailBox[mailboxNo].TIR |=  1;                     // transmit message
-}
-
-void toggle_led(int LED)
-{
-	int LED_BANK;
-	
-	LED_BANK = GPIOE->IDR;
-	
-	// If LED is on
-	if (LED_BANK & LED)
-	{
-		// Turn LED off
-		GPIOE->ODR &= ~(LED); 
-	}
-	else if (LED_BANK & ~(LED))
-	{
-		// Turn LED on
-		GPIOE->ODR |= LED;
-	}
-	else
-	{
-		// What is happening - Bad Case
-		LED = 256;
-	}	
 }
 
 void configureAdc()
