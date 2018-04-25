@@ -8,12 +8,14 @@
 //#include <iostream>
 #include <string>
 
-//#define Id0 0xBADCAFE
+#define Id0 0xBADCAFE
 #define Id1 0x01A4F2B
 #define Id2 0x0024FcE
 
 #define STANDARD_FORMAT  0
 #define EXTENDED_FORMAT  1
+
+CAN_msg  CAN_TxMsg, CAN_RxMsg;
 
 // Function Prototypes
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
@@ -110,21 +112,21 @@ int main(void)
 	
 	configureAdc();
 
-	unsigned char led8Data[4] = "wor";
+	unsigned char led8Data[4] = {0x01};
 	CAN_msg led8Message[1];
-	led8Message->id = 0x01A4F2B;
-	for (int i = 0; i < 4; i++) 
+	led8Message->id = 0x01AEFCA;
+	for (int i = 0; i < 1; i++) 
 	{led8Message->data[i] = led8Data[i];}
-	led8Message->len = 4;
+	led8Message->len = 1;
 	led8Message->format = STANDARD;
 	led8Message->type = DATA_FRAME;
 	
-	unsigned char led9Data[4] = "ana";
+	unsigned char led9Data[4] = {0x01};
 	CAN_msg led9Message[1];
-	led9Message->id = 0x0024FCE;
-	for (int i = 0; i < 4; i++) 
+	led9Message->id = 0x002BEF;
+	for (int i = 0; i < 1; i++) 
 	{led9Message->data[i] = led9Data[i];}
-	led9Message->len = 4;
+	led9Message->len = 1;
 	led9Message->format = STANDARD;
 	led9Message->type = DATA_FRAME;
 	
@@ -132,6 +134,10 @@ int main(void)
 	GLCD_Clear(White);
 	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
 	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
+	
+	// enable interrupt 
+	initializeCanFilters();
+	NVIC->ISER[0] |= (1 << 20);       // enable CAN1_Rx interrupt
 	
   // Main loop
   while (1)
@@ -185,7 +191,7 @@ int main(void)
 		
 		txCAN(adcMessage);
 		// needed for the 5Hz update rate 
-		delay_software_ms(50);
+		delay_software_ms(180);
   }
 } 
 
@@ -206,7 +212,8 @@ void initializeCanFilters()
 	rCAN1_FMR.b.bfinit = 1;
 	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
 	
-	// filter initialization
+	// filter initialization based on Id1 and Id2 
+	CAN_wrFilter(Id0, STANDARD_FORMAT, 0);
 	CAN_wrFilter(Id1, STANDARD_FORMAT, 0);
 	CAN_wrFilter(Id2, STANDARD_FORMAT, 0);
 	
@@ -269,6 +276,54 @@ void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_typ
   CAN_filterIdx += 1; 
 }
 
+void CAN_rdMsg ( CAN_msg *msg)  {
+	
+  if ((CAN1->sFIFOMailBox[0].RIR & 0x4)==0) { //CAN_ID_EXT) == 0) { // Standard ID
+    msg->format = STANDARD_FORMAT;
+    msg->id     = (unsigned int) 0x000007FF & (CAN1->sFIFOMailBox[0].RIR >> 21);
+  }  else  {                                          // Extended ID
+    msg->format = EXTENDED_FORMAT;
+    msg->id     = (unsigned int) 0x1FFFFFFF & ((CAN1->sFIFOMailBox[0].RIR >> 3));
+  }
+	
+  // Read type information
+  if ((CAN1->sFIFOMailBox[0].RIR & 0x2) ==0) { //CAN_RTR_REMOTE) == 0) {
+    msg->type = DATA_FRAME;                     // DATA   FRAME
+  }  else  {
+    msg->type = REMOTE_FRAME;                     // REMOTE FRAME
+  }
+	
+  // Read length (number of received bytes)
+  msg->len = (unsigned char)0x0000000F & CAN1->sFIFOMailBox[0].RDTR;
+	
+  // Read data bytes
+  msg->data[0] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR);
+  msg->data[1] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR >> 8);
+  msg->data[2] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR >> 16);
+  msg->data[3] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR >> 24);
+
+  msg->data[4] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR);
+  msg->data[5] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR >> 8);
+  msg->data[6] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR >> 16);
+  msg->data[7] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR >> 24);
+}
+
+//CAN1 receiver interrupt
+void CAN1_RX0_IRQHandler(void) {
+ GPIOE->BSRR = 1<<10;   //LED ON for observation on MSO  
+ if (CAN1->RF0R & 3) {			      // message pending ?
+   CAN_rdMsg (&CAN_RxMsg);                       // read the message
+	 CAN1->RF0R |= 0x20;                    // Release FIFO 0 output mailbox 
+   //   CAN_RxRdy = 1;                                // set receive flag
+	 
+	 GLCD_DisplayString(5, 1, (unsigned char*)"CAN message address: ");
+	 GLCD_DisplayString(6, 1, (unsigned char*)CAN_RxMsg.id);
+	 GLCD_DisplayString(7, 1, (unsigned char*)"CAN message data: ");
+	 GLCD_DisplayString(8, 1, (unsigned char*)CAN_RxMsg.data);
+	 
+	 GPIOE->BSRR = 1<<(10+16);  // LED OFF
+ }
+}
 
 void initializeLabSpecs()
 {
