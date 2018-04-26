@@ -13,9 +13,8 @@
 //#include <iostream>
 #include <string>
 
-#define Id0 0xBADCAFE
-#define Id1 0x01A4F2B
-#define Id2 0x0024FcE
+#define IDRX0 0x01A4F2B
+#define IDRX1 0x0024FCE
 
 #define STANDARD_FORMAT  0
 #define EXTENDED_FORMAT  1
@@ -221,24 +220,6 @@ void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataP
 	*iregisterAddress = idataPacket;
 }
 
-void initializeCanFilters()
-{
-	// enable initialziation mode 
-	CAN_FMR rCAN1_FMR;
-	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
-	rCAN1_FMR.b.bfinit = 1;
-	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
-	
-	// filter initialization based on Id1 and Id2 
-	CAN_wrFilter(Id0, STANDARD_FORMAT, 0);
-	CAN_wrFilter(Id1, STANDARD_FORMAT, 0);
-	CAN_wrFilter(Id2, STANDARD_FORMAT, 0);
-	
-	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
-	rCAN1_FMR.d32 &= ~1;
-	writeRegister(RCAN1_FMR,rCAN1_FMR.d32);
-}
-
 void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type)  {
 	
 	static unsigned short CAN_filterIdx = 0;
@@ -420,11 +401,12 @@ void initializeLabSpecs()
 }
 
 
-void initFilter(unsigned int filterAddress)
+void initFilter(void)
 {
 	// =======================================================
 	// CAN Filter Initialization
 	// =======================================================
+	
 	// Disable CAN reception to set CAN filters
 	CAN_FMR rCAN1_FMR;
 	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
@@ -448,23 +430,24 @@ void initFilter(unsigned int filterAddress)
 	// Set Filter scale
 	CAN_FS1R rCAN1_FS1R;
 	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
-	rCAN1_FS1R.b.bfsc0 = 1;		// Set filter scale to 32-bit
-	rCAN1_FS1R.b.bfsc1 = 1;	// Set filter scale to 32-bit
+	rCAN1_FS1R.b.bfsc0 = 1;			// Set filter scale to 32-bit
+	rCAN1_FS1R.b.bfsc1 = 1;			// Set filter scale to 32-bit
 	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
 
-	// Setup Filter Bank 0 Pair
-	//CAN_FiRx rCAN1_F0R1;
-	//rCAN1_F0R1.d32 = writeRegister(RCAN1_FiRx, filterAddress);
-	// TODO Fix line above
+	// Setup Filter Mask
+	// shift address left by 3
+	// OR with 0x04
+	unsigned int mask0 = (IDRX0 << 3) | 0x04;
+	CAN_FiRx rCAN1_F0R1;
+	rCAN1_F0R1.d32 = readRegister(RCAN1_F0R1);
+	rCAN1_F0R1.d32 |= mask0;
+	writeRegister(RCAN1_F0R1, rCAN1_F0R1.d32);
 	
-	// read the init
-	CAN_MSR rCAN1_MSR;
-	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
-	while(rCAN1_MSR.b.binak == 1)
-	{
-		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
-		// timeout is less than x 
-	}
+	unsigned int mask1 = (IDRX1 << 3) | 0x04;
+	CAN_FiRx rCAN1_F1R1;
+	rCAN1_F1R1.d32 = readRegister(RCAN1_F1R1);
+	rCAN1_F1R1.d32 |= mask1;
+	writeRegister(RCAN1_F1R1, rCAN1_F1R1.d32);	
 
 	// Set FIFO destination for each filter
 	CAN_FFA1R rCAN1_FFA1R;
@@ -475,7 +458,7 @@ void initFilter(unsigned int filterAddress)
 
 	// Enable CAN reception now that filters are setup
 	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
-	rCAN1_FMR.b.bfinit = 0;	// Enable CAN reception
+	rCAN1_FMR.b.bfinit = 0;			// Enable CAN reception
 	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
 }
 
@@ -561,8 +544,6 @@ void rxCAN(void)
 	// if mailbox is full (CAN_RFR FOVR = 1) and a message has been lost\
 	
 	
-	// if 
-
 }
 
 int checkMailbox()
