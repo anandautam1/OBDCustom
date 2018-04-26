@@ -13,7 +13,8 @@
 //#include <iostream>
 #include <string>
 
-#define IDRX0 0x01A4F2B
+#define IDRX0 0x0BADCAFE
+//#define IDRX0 0x01A4F2B
 #define IDRX1 0x0024FCE
 
 #define STANDARD_FORMAT  0
@@ -132,7 +133,7 @@ int main(void)
 	for (int i = 0; i < 1; i++) 
 	{led8Message->data[i] = led8Data[i];}
 	led8Message->len = 1;
-	led8Message->format = STANDARD;
+	led8Message->format = EXTENDED_IDENTIFIER;
 	led8Message->type = DATA_FRAME;
 	
 	unsigned char led9Data[4] = {0x01};
@@ -141,7 +142,7 @@ int main(void)
 	for (int i = 0; i < 1; i++) 
 	{led9Message->data[i] = led9Data[i];}
 	led9Message->len = 1;
-	led9Message->format = STANDARD;
+	led9Message->format = EXTENDED_IDENTIFIER;
 	led9Message->type = DATA_FRAME;
 	
 	// CAN Setup
@@ -200,23 +201,33 @@ int main(void)
 		// on graph its 340E but read 0E34
 		
 		CAN_msg adcMessage[4];
-		adcMessage->id = 0xBADCAFE;
+		adcMessage->id = 0x0BADCAFE;
 		for (int i = 0; i < 4; i++) 
 		{adcMessage->data[i] = adcData.bytes[i];}
 		adcMessage->len = 4;
-		adcMessage->format = STANDARD;
+		adcMessage->format = EXTENDED_IDENTIFIER;
 		adcMessage->type = DATA_FRAME;
 		
 		txCAN(adcMessage);
 		
-		// Read CAN Message
-		CAN_msg rx_msg;
+		delay_software_ms(10);	// TODO - This might not be needed
 		
-		rxCAN(&rx_msg);
-		fifoHandler();
+		// Read CAN Message
+		// Check if FIFO has a message
+		CAN_RFxR rCAN1_RF0R;
+		rCAN1_RF0R.d32 = readRegister(RCAN1_RF0R);
+		
+		if (rCAN1_RF0R.b.bfmp > 0)
+		{
+			CAN_msg rx_msg;
+			
+			rxCAN(&rx_msg);
+			fifoHandler();
+		}
 		
 		// needed for the 5Hz update rate 
-		delay_software_ms(180);
+		// default was 180
+		delay_software_ms(60);
   }
 } 
 
@@ -231,92 +242,104 @@ void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataP
 	*iregisterAddress = idataPacket;
 }
 
-void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type)  
-{
-	
-	static unsigned short CAN_filterIdx = 0;
-         unsigned int   CAN_msgId     = 0;
-	
-	if (CAN_filterIdx > 13) {                       // check if Filter Memory is full
-    return;
-  }
-	
-  // Setup identifier information
-  if (format == STANDARD_FORMAT)  {               // Standard ID
-      CAN_msgId  |= (unsigned int)(id << 21) | 0; //CAN_ID_STD;
-  }  else  {                                      // Extended ID
-      CAN_msgId  |= (unsigned int)(id <<  3) | 4; //CAN_ID_EXT;
-  }
-  if (mess_type == 1)	CAN_msgId  |= 2;
+//void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type)  
+//{
+//	
+//	static unsigned short CAN_filterIdx = 0;
+//         unsigned int   CAN_msgId     = 0;
+//	
+//	if (CAN_filterIdx > 13) {                       // check if Filter Memory is full
+//    return;
+//  }
+//	
+//  // Setup identifier information
+//  if (format == STANDARD_FORMAT)  {               // Standard ID
+//      CAN_msgId  |= (unsigned int)(id << 21) | 0; //CAN_ID_STD;
+//  }  else  {                                      // Extended ID
+//      CAN_msgId  |= (unsigned int)(id <<  3) | 4; //CAN_ID_EXT;
+//  }
+//  if (mess_type == 1)	CAN_msgId  |= 2;
 
-	CAN_FA1R rCAN1_FA1R;
-	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
-	rCAN1_FA1R.d32 &= ~(unsigned int) (1 << CAN_filterIdx);
-	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
-	
-  // initialize filter
-	// set 32-bit scale configuration
-	CAN_FS1R rCAN1_FS1R;
-	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
-	rCAN1_FS1R.d32 |= (unsigned int) (1 << CAN_filterIdx);
-	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
-	
-	// set 2 32-bit identifier list mode
-	CAN_FM1R rCAN1_FM1R;
-	rCAN1_FM1R.d32 = readRegister(RCAN1_FM1R);
-	rCAN1_FM1R.d32 |= (unsigned int)(1 << CAN_filterIdx);
-  writeRegister(RCAN1_FM1R, rCAN1_FM1R.d32);
+//	CAN_FA1R rCAN1_FA1R;
+//	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
+//	rCAN1_FA1R.d32 &= ~(unsigned int) (1 << CAN_filterIdx);
+//	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
+//	
+//  // initialize filter
+//	// set 32-bit scale configuration
+//	CAN_FS1R rCAN1_FS1R;
+//	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
+//	rCAN1_FS1R.d32 |= (unsigned int) (1 << CAN_filterIdx);
+//	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
+//	
+//	// set 2 32-bit identifier list mode
+//	CAN_FM1R rCAN1_FM1R;
+//	rCAN1_FM1R.d32 = readRegister(RCAN1_FM1R);
+//	rCAN1_FM1R.d32 |= (unsigned int)(1 << CAN_filterIdx);
+//  writeRegister(RCAN1_FM1R, rCAN1_FM1R.d32);
 
-	// not sure on how to use the classes for the array register access on the register better best to leave it 
-  CAN1->sFilterRegister[CAN_filterIdx].FR1 = CAN_msgId; //  32-bit identifier
-  CAN1->sFilterRegister[CAN_filterIdx].FR2 = CAN_msgId; //  32-bit identifier
-    													   
-	// assign filter to FIFO 0
-	CAN_FFA1R rCAN1_FFA1R;
-	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
-	rCAN1_FFA1R.d32 &= ~(unsigned int)(1 << CAN_filterIdx); 
-	writeRegister(RCAN1_FFA1R, rCAN1_FFA1R.d32);
-	
-	// activate filter
-	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
-	rCAN1_FA1R.d32 |=  (unsigned int)(1 << CAN_filterIdx);
-	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
-  
-	// increment the static variable for any instanceof a new filter 
-  CAN_filterIdx += 1; 
-}
+//	// not sure on how to use the classes for the array register access on the register better best to leave it 
+//  CAN1->sFilterRegister[CAN_filterIdx].FR1 = CAN_msgId; //  32-bit identifier
+//  CAN1->sFilterRegister[CAN_filterIdx].FR2 = CAN_msgId; //  32-bit identifier
+//    													   
+//	// assign filter to FIFO 0
+//	CAN_FFA1R rCAN1_FFA1R;
+//	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
+//	rCAN1_FFA1R.d32 &= ~(unsigned int)(1 << CAN_filterIdx); 
+//	writeRegister(RCAN1_FFA1R, rCAN1_FFA1R.d32);
+//	
+//	// activate filter
+//	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
+//	rCAN1_FA1R.d32 |=  (unsigned int)(1 << CAN_filterIdx);
+//	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
+//  
+//	// increment the static variable for any instanceof a new filter 
+//  CAN_filterIdx += 1; 
+//}
 
 void rxCAN ( CAN_msg *msg)  
 {
-	
-  if ((CAN1->sFIFOMailBox[0].RIR & 0x4)==0) { //CAN_ID_EXT) == 0) { // Standard ID
-    msg->format = STANDARD_FORMAT;
-    msg->id     = (unsigned int) 0x000007FF & (CAN1->sFIFOMailBox[0].RIR >> 21);
-  }  else  {                                          // Extended ID
-    msg->format = EXTENDED_FORMAT;
-    msg->id     = (unsigned int) 0x1FFFFFFF & ((CAN1->sFIFOMailBox[0].RIR >> 3));
-  }
-	
-  // Read type information
-  if ((CAN1->sFIFOMailBox[0].RIR & 0x2) ==0) { //CAN_RTR_REMOTE) == 0) {
-    msg->type = DATA_FRAME;                     // DATA   FRAME
-  }  else  {
-    msg->type = REMOTE_FRAME;                     // REMOTE FRAME
-  }
-	
-  // Read length (number of received bytes)
-  msg->len = (unsigned char)0x0000000F & CAN1->sFIFOMailBox[0].RDTR;
-	
-  // Read data bytes
-  msg->data[0] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR);
-  msg->data[1] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR >> 8);
-  msg->data[2] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR >> 16);
-  msg->data[3] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDLR >> 24);
+	CAN_RIxR rCAN1_RI0R;
+	rCAN1_RI0R.d32 = readRegister(RCAN1_RI0R);
 
-  msg->data[4] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR);
-  msg->data[5] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR >> 8);
-  msg->data[6] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR >> 16);
-  msg->data[7] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR >> 24);
+	msg->format = rCAN1_RI0R.b.bide;
+	msg->type 	= rCAN1_RI0R.b.brtr;
+	
+	// Check identifier
+	if (msg->format == 1)
+	{
+		// Extended Identifier
+		msg->id 		= (unsigned int) 0x1FFFFFFF & (rCAN1_RI0R.d32 >> 3);	
+	}
+	else
+	{
+		// Standard Identifier
+		msg->id 		= (unsigned int) 0x000007FF & (rCAN1_RI0R.d32 >> 21);
+	}
+	
+	// Check length identifier 
+	CAN_RDTxR rCAN1_RDT0R;
+	rCAN1_RDT0R.d32 = readRegister(RCAN1_RDT0R);
+	msg->len = rCAN1_RDT0R.b.bdlc; 
+	
+	// Read data low register
+	CAN_TDLxR rCAN1_RDLR;
+	rCAN1_RDLR.d32 = readRegister(RCAN1_TDL0R);
+	
+	// Read data high register
+	CAN_TDHxR rCAN1_RDHR;
+	rCAN1_RDHR.d32 = readRegister(RCAN1_TDH0R);
+
+	// Read in data
+	msg->data[0] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32);
+	msg->data[1] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32 >> 8);
+	msg->data[2] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32 >> 16);
+	msg->data[3] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32 >> 24);
+
+	msg->data[4] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32);
+	msg->data[5] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32 >> 8);
+	msg->data[6] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32 >> 16);
+	msg->data[7] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32 >> 24);
 }
 
 void fifoHandler(void)
@@ -440,8 +463,8 @@ void initFilter(void)
 	// Activate CAN filters	
 	CAN_FA1R rCAN1_FA1R;
 	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
-	rCAN1_FA1R.b.bfact0 = 1;		// Set filter0 to active
-	rCAN1_FA1R.b.bfact1 = 1;		// Set filter1 to active	
+	rCAN1_FA1R.b.bfact0 = 1;		//TODO Set filter0 to active
+	rCAN1_FA1R.b.bfact1 = 1;		//TODO Set filter1 to active	
 	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
 	
 	// Set Filter identifier list or identifier mask
@@ -464,13 +487,13 @@ void initFilter(void)
 	unsigned int mask0 = (IDRX0 << 3) | 0x04;
 	CAN_FiRx rCAN1_F0R1;
 	rCAN1_F0R1.d32 = readRegister(RCAN1_F0R1);
-	rCAN1_F0R1.d32 |= mask0;
+	rCAN1_F0R1.d32 = mask0;
 	writeRegister(RCAN1_F0R1, rCAN1_F0R1.d32);
 	
 	unsigned int mask1 = (IDRX1 << 3) | 0x04;
 	CAN_FiRx rCAN1_F1R1;
 	rCAN1_F1R1.d32 = readRegister(RCAN1_F1R1);
-	rCAN1_F1R1.d32 |= mask1;
+	rCAN1_F1R1.d32 = mask1;
 	writeRegister(RCAN1_F1R1, rCAN1_F1R1.d32);	
 
 	// Set FIFO destination for each filter
