@@ -247,8 +247,12 @@ void initializeLabSpecs()
 	// the apbr1 default clock is 36MHz 
 	// bit field 8 brp set to 8 ... 
 	rCAN1_BTR.b.bbrp = 8;
-	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
-	
+	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);	
+}
+
+
+void initFilter(unsigned int filterAddress)
+{
 	// =======================================================
 	// CAN Filter Initialization
 	// =======================================================
@@ -268,50 +272,33 @@ void initializeLabSpecs()
 	// Set Filter identifier list or identifier mask
 	CAN_FM1R rCAN1_FM1R;
 	rCAN1_FM1R.d32 = readRegister(RCAN1_FM1R);
-	rCAN1_FM1R.b.bfmb0 = 0;	 		// Set filter0 to use identifier mask mode	// TODO - check if this is right
-	rCAN1_FM1R.b.bfmb1 = 1;			// Set filter1 to use identifier list mode	// TODO - check if this is right
+	rCAN1_FM1R.b.bfmb0 = 0;	 		// Set filter0 to use identifier mask mode
+	rCAN1_FM1R.b.bfmb1 = 0;			// Set filter1 to use identifier mask mode
 	writeRegister(RCAN1_FM1R, rCAN1_FM1R.d32);
 	
 	// Set Filter scale
 	CAN_FS1R rCAN1_FS1R;
 	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
-	rCAN1_FS1R.b.bfsc0 = 0;		// TODO - check if this is right
-	rCAN1_FS1R.b.bfsc1 = 0;		// TODO - check if this is right
+	rCAN1_FS1R.b.bfsc0 = 1;		// Set filter scale to 32-bit
+	rCAN1_FS1R.b.bfsc1 = 1;	// Set filter scale to 32-bit
 	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
 
 	// Setup Filter Bank 0 Pair
 	CAN_FiRx rCAN1_F0R1;
-	CAN_FiRx rCAN1_F0R2;	
-	rCAN1_F0R1.d32 = readRegister(RCAN1_F0R1);
-	rCAN1_F0R2.d32 = readRegister(RCAN1_F0R2);
-	rCAN1_F0R1.b.bfb = 0;		// TODO - set filter mask
-	rCAN1_F0R2.b.bfb = 0;		// TODO - set filter mask
-	writeRegister(RCAN1_F0R1, rCAN1_F0R1.d32);
-	writeRegister(RCAN1_F0R2, rCAN1_F0R2.d32);
+	rCAN1_F0R1.d32 = writeRegister(RCAN1_FiRx, filterAddress);
+	// TODO Fix line above
 	
-	// Setup Filter Bank 1 Pair
-	CAN_FiRx rCAN1_F1R1;
-	CAN_FiRx rCAN1_F1R2;	
-	rCAN1_F1R1.d32 = readRegister(RCAN1_F1R1);
-	rCAN1_F1R2.d32 = readRegister(RCAN1_F1R2);
-	rCAN1_F1R1.b.bfb = 0;		// TODO - set filter mask
-	rCAN1_F1R2.b.bfb = 0;		// TODO - set filter mask
-	writeRegister(RCAN1_F1R1, rCAN1_F1R1.d32);
-	writeRegister(RCAN1_F1R2, rCAN1_F1R2.d32);
-
 	// Set FIFO destination for each filter
 	CAN_FFA1R rCAN1_FFA1R;
 	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
 	rCAN1_FFA1R.b.bffa0 = 0;		// Set filter0 to send message to FIFO0
-	rCAN1_FFA1R.b.bffa1 = 1;		// Set filter1 to send message to FIFO1
+	rCAN1_FFA1R.b.bffa1 = 0;		// Set filter1 to send message to FIFO0
 	writeRegister(RCAN1_FFA1R, rCAN1_FFA1R.d32);
 
 	// Enable CAN reception now that filters are setup
 	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
 	rCAN1_FMR.b.bfinit = 0;	// Enable CAN reception
 	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
-	
-	
 }
 
 void txCAN(CAN_msg *finalMessage)
