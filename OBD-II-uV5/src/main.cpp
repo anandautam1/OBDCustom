@@ -136,8 +136,8 @@ int main(void)
 	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
 	
 	// enable interrupt 
-	initializeCanFilters();
-	NVIC->ISER[0] |= (1 << 20);       // enable CAN1_Rx interrupt
+	//initializeCanFilters();
+	//NVIC->ISER[0] |= (1 << 20);       // enable CAN1_Rx interrupt
 	
   // Main loop
   while (1)
