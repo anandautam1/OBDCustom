@@ -1,5 +1,5 @@
 Dependencies for Project 'OBD-II_Emulator', Target 'STM32F1 RAM': (DO NOT MODIFY !)
-F (.\src\main.cpp)(0x5AE143A1)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
+F (.\src\main.cpp)(0x5AE14421)(--cpp -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork -I .\inc-I.\RTE\Device\STM32F107VC-I.\RTE\_STM32F1_RAM-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include-IC:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include-D__UVISION_VERSION="525" -D_RTE_ -DSTM32F10X_CL -DVECT_TAB_SRAM -DSTM32F10X_CL-o .\ram\main.o --omf_browse .\ram\main.crf --depend .\ram\main.d)
 I (.\inc\stm32f10x_it.h)(0x5AD855D0)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h)(0x58251C4C)
 I (.\RTE\_STM32F1_RAM\RTE_Components.h)(0x5AD855D0)
@@ -13,7 +13,7 @@ I (.\inc\RCCController.h)(0x5AD855D0)
 I (.\inc\GPIOController.h)(0x5ADD2FAB)
 I (.\inc\utility.h)(0x5AE1430D)
 I (.\inc\canRegisters.h)(0x5AE14052)
-I (.\inc\canController.h)(0x5AE14052)
+I (.\inc\canController.h)(0x5AE14447)
 I (.\inc\DispCode.h)(0x5ADD2FAB)
 I (C:\Keil_v5\ARM\ARMCC\include\string)(0x564D323E)
 I (C:\Keil_v5\ARM\ARMCC\include\iosfwd)(0x564D323E)
