@@ -12,6 +12,7 @@
 .\ram\main.o: .\inc\GPIOController.h
 .\ram\main.o: .\inc\utility.h
 .\ram\main.o: .\inc\canRegisters.h
+.\ram\main.o: .\inc\canController.h
 .\ram\main.o: .\inc\DispCode.h
 .\ram\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string
 .\ram\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\iosfwd

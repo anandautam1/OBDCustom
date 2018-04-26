@@ -142,27 +142,25 @@ int main(void)
 	
 	// CAN Setup
 	canInit();
-
-#ifdef LAB_HARDWARE
+	
 	// LCD Code
 	GLCD_Init();
 	GLCD_Clear(White);
 	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
 	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
-#endif
 	
 	// enable interrupt 
-	initializeCanFilters();
-	NVIC->ISER[0] |= (1 << 20);       // enable CAN1_Rx interrupt
+	//initializeCanFilters();
+	//NVIC->ISER[0] |= (1 << 20);       // enable CAN1_Rx interrupt
 	
   // Main loop
   while (1)
   {
 		
-		//int result = readAdc();
+		int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
 		char resultChars[20]; 
-		std::sprintf(resultChars,"%i  ",result);
+		std::sprintf(resultChars,"%i  ", result);
 		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
 		
 		// Read User Button
@@ -198,7 +196,7 @@ int main(void)
 		// if data 0E34
 		// on graph its 340E but read 0E34
 		
-		CAN_msg adcMessage[1];
+		CAN_msg adcMessage[4];
 		adcMessage->id = 0xBADCAFE;
 		for (int i = 0; i < 4; i++) 
 		{adcMessage->data[i] = adcData.bytes[i];}
@@ -414,19 +412,19 @@ void initFilter(unsigned int filterAddress)
 	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
 
 	// Setup Filter Bank 0 Pair
-	CAN_FiRx rCAN1_F0R1;
-	rCAN1_F0R1.d32 = writeRegister(RCAN1_FiRx, filterAddress);
+	//CAN_FiRx rCAN1_F0R1;
+	//rCAN1_F0R1.d32 = writeRegister(RCAN1_FiRx, filterAddress);
 	// TODO Fix line above
 	
-<<<<<<<
 	// read the init
+	CAN_MSR rCAN1_MSR;
 	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
 	while(rCAN1_MSR.b.binak == 1)
 	{
 		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
 		// timeout is less than x 
 	}
-=======
+
 	// Set FIFO destination for each filter
 	CAN_FFA1R rCAN1_FFA1R;
 	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
@@ -438,7 +436,6 @@ void initFilter(unsigned int filterAddress)
 	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
 	rCAN1_FMR.b.bfinit = 0;	// Enable CAN reception
 	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
->>>>>>>
 }
 
 void txCAN(CAN_msg *finalMessage)
@@ -468,9 +465,12 @@ void txCAN(CAN_msg *finalMessage)
 	}
 }
 
-<<<<<<<
+
 int checkTxMailbox()
-=======
+{
+	return 0;
+}
+
 void rxCAN(void)
 {
 	// Check FIFO output mailbox
@@ -478,9 +478,9 @@ void rxCAN(void)
 	// Read FIFO mailbox contents
 	
 	// Release FIFo mailbox by setting the RFOM bit in the CAN FRF register
-	CAN_RF0R rCAN1_RF0R;	// TODO 
-	rCAN1_RF0R.d32 = readRegister(RCAN_RF0R);
-	rCAN1_RF0R.b.brfom0 = 1;
+	//CAN_RF0R rCAN1_RF0R;	// TODO 
+	//rCAN1_RF0R.d32 = readRegister(RCAN_RF0R);
+	//rCAN1_RF0R.b.brfom0 = 1;
 	
 	
 	// if FIFO is full and a new message has been received
@@ -490,7 +490,7 @@ void rxCAN(void)
 		// FULL0 will be set
 		// FULL0 needs to be cleared by software
 	
-	writeRegister(RCAN_RF0R, rCAN1_RF0R.d32);
+	//writeRegister(RCAN_RF0R, rCAN1_RF0R.d32);
 	
 	// TODO - Repeat above code for FIFO 1
 	
@@ -505,7 +505,6 @@ void rxCAN(void)
 }
 
 int checkMailbox()
->>>>>>>
 {
 	// determine free mailbox put mailbox_no as argument 
 	CAN_TSR rCAN1_TSR;
@@ -620,7 +619,5 @@ int readAdc()
 	result = ADC1->DR;
 	return result;
 }
-
-#endif
 
 // EOF

@@ -1,9 +1,9 @@
 <html>
 <body>
 <pre>
-<h1>ï¿½Vision Build Log</h1>
+<h1>µVision Build Log</h1>
 <h2>Tool Versions:</h2>
-IDE-Version: ï¿½Vision V5.25.2.0
+IDE-Version: µVision V5.25.2.0
 Copyright (C) 2018 ARM Ltd and ARM Germany GmbH. All rights reserved.
 License Information: Michael Stekla, RMIT, LIC=----
  
@@ -27,22 +27,17 @@ Project File Date:  04/24/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'STM32F1 RAM'
-compiling DispCode.cpp...
-compiling RCCController.cpp...
-compiling stm32f10x_it.c...
-compiling system_stm32f10x.c...
-compiling canController.cpp...
-canController.h(4): warning:  #1-D: last line of file ends without a newline
-  void canwriteRegister(volatile unsigned int * , unsigned int );
-canController.cpp(10): warning:  #177-D: variable "rAPB1RSTR"  was declared but never referenced
-  	RCC_APB1RSTR rAPB1RSTR;
-canController.cpp(28): warning:  #1-D: last line of file ends without a newline
-  }
-canController.cpp: 3 warnings, 0 errors
 compiling main.cpp...
-linking...
-Program Size: Code=9484 RO-data=376 RW-data=5404 ZI-data=1668  
-".\RAM\OBD-II_Emulator.axf" - 0 Error(s), 0 Warning(s).
+.\inc\canController.h(9): error:  #37: the #endif for this directive is missing
+  #ifndef __CAN_CONTROLLER_H__
+src\main.cpp(349): warning:  #177-D: variable "rCAN1_MSR"  was declared but never referenced
+  	CAN_MSR rCAN1_MSR;
+src\main.cpp(352): warning:  #177-D: variable "rCAN1_TSR"  was declared but never referenced
+  	CAN_TSR rCAN1_TSR;
+src\main.cpp(472): warning:  #940-D: missing return statement at end of non-void function "checkTxMailbox" 
+  }
+src\main.cpp: 3 warnings, 1 error
+".\RAM\OBD-II_Emulator.axf" - 1 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -69,13 +64,12 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.1.1
 
    * Component: Keil::Device:Startup:1.0.0
-      Source file:   Device\Source\system_stm32f10x.c
-      Include file:  RTE_Driver\Config\RTE_Device.h
       Source file:   Device\Source\ARM\STM32F1xx_OPT.s
       Source file:   Device\Source\ARM\startup_stm32f10x_cl.s
-      Source file:   Device\Source\system_stm32f10x.c
       Include file:  RTE_Driver\Config\RTE_Device.h
-Build Time Elapsed:  00:00:01
+      Source file:   Device\Source\system_stm32f10x.c
+Target not created.
+Build Time Elapsed:  00:00:00
 </pre>
 </body>
 </html>
