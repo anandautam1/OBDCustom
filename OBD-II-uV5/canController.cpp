@@ -15,7 +15,7 @@ void canInit()
 	canwriteRegister(RRCC_APB1ENR, rAPB1ENR.d32);
 	
 	// reset the can interface
-	// rAPB2_RSTR.d32;
+	//rAPB2_RSTR.d32;
 	
 	// enable the CAN clocks 
 }

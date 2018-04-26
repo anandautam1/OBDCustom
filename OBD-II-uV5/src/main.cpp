@@ -159,7 +159,7 @@ int main(void)
   while (1)
   {
 		
-		int result = readAdc();
+		//int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
 		char resultChars[20]; 
 		std::sprintf(resultChars,"%i  ",result);
@@ -347,71 +347,78 @@ void CAN1_RX0_IRQHandler(void) {
 void initializeLabSpecs()
 {
 	// delacre the variable register with the offset 
-	volatile CAN_MCR rCAN1_MCR;
-	volatile CAN_MSR rCAN1_MSR;
+	CAN_MCR rCAN1_MCR;
+	CAN_MSR rCAN1_MSR;
 	
 	CAN_BTR rCAN1_BTR;
-	
-	//CAN_TSR rCAN1_TSR;
+	CAN_TSR rCAN1_TSR;
 	// end of definition 
-	
-	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-	rCAN1_MCR.b.breset = 1;
-	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
-	
-	// what till the MCR has been free
-	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-	while(rCAN1_MCR.b.breset == 1)
-	{
-		rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-		// timeout is less than x 
-	}
 	
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
 	// initialize the bit 
 	rCAN1_MCR.b.binrq = 1;
-	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
-	
-	// reat the init
-	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
-	while(rCAN1_MSR.b.binak == 0)
-	{
-		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
-		// timeout is less than x 
-	}
-	
-	// set the timing register 
-	rCAN1_BTR.d32 = readRegister(RCAN1_BTR); 
-	
-	// BTR bit timing register
-	// loopback mode 
-	// the apbr1 default clock is 36MHz 
-	// bit field 8 brp set to 8 ... 
-	// resynchronization 
-	rCAN1_BTR.b.bsjw = 0x02;
-	// time segment 2
-	rCAN1_BTR.b.bts2 = 0x02;
-	// time segment 1 
-	rCAN1_BTR.b.bts1 = 0x0B;
-	// set the baud rate 250kHz 
-	rCAN1_BTR.b.bbrp = 0x08;
-	// disable loopback 
-	rCAN1_BTR.b.blbkm = 0;
-	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
-	
-	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
 	// set to 1 even if packet error occurs 
 	rCAN1_MCR.b.bnart = 1;
-	writeRegister(RCAN1_MCR, rCAN1_MCR.d32);
 	// set reset to 1 to check if the periperhals has been resetted 
+	rCAN1_MCR.b.breset = 1;
 	// exit the sleep mode 
-	
-	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-	// set to 1 even if packet error occurs 
-	rCAN1_MCR.b.binrq = 0;
 	rCAN1_MCR.b.bsleep = 0;
-	writeRegister(RCAN1_MCR, rCAN1_MCR.d32);
+	// Set the CAN mailbox to overwrite old data when it is full
+	rCAN1_MCR.b.brflm = 0;
+	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
 	
+	// what till the MCR has been free
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	while(rCAN1_MCR.b.breset)
+	{
+		rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	}
+	 
+	// the apbr1 default clock is 36MHz 
+	// bit field 8 brp set to 8 ... 
+	rCAN1_BTR.b.bbrp = 8;
+	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);	
+}
+
+
+void initFilter(unsigned int filterAddress)
+{
+	// =======================================================
+	// CAN Filter Initialization
+	// =======================================================
+	// Disable CAN reception to set CAN filters
+	CAN_FMR rCAN1_FMR;
+	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
+	rCAN1_FMR.b.bfinit = 1;		// Disable CAN reception
+	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
+	
+	// Activate CAN filters	
+	CAN_FA1R rCAN1_FA1R;
+	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
+	rCAN1_FA1R.b.bfact0 = 1;		// Set filter0 to active
+	rCAN1_FA1R.b.bfact1 = 1;		// Set filter1 to active	
+	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
+	
+	// Set Filter identifier list or identifier mask
+	CAN_FM1R rCAN1_FM1R;
+	rCAN1_FM1R.d32 = readRegister(RCAN1_FM1R);
+	rCAN1_FM1R.b.bfmb0 = 0;	 		// Set filter0 to use identifier mask mode
+	rCAN1_FM1R.b.bfmb1 = 0;			// Set filter1 to use identifier mask mode
+	writeRegister(RCAN1_FM1R, rCAN1_FM1R.d32);
+	
+	// Set Filter scale
+	CAN_FS1R rCAN1_FS1R;
+	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
+	rCAN1_FS1R.b.bfsc0 = 1;		// Set filter scale to 32-bit
+	rCAN1_FS1R.b.bfsc1 = 1;	// Set filter scale to 32-bit
+	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
+
+	// Setup Filter Bank 0 Pair
+	CAN_FiRx rCAN1_F0R1;
+	rCAN1_F0R1.d32 = writeRegister(RCAN1_FiRx, filterAddress);
+	// TODO Fix line above
+	
+<<<<<<<
 	// read the init
 	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
 	while(rCAN1_MSR.b.binak == 1)
@@ -419,6 +426,19 @@ void initializeLabSpecs()
 		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
 		// timeout is less than x 
 	}
+=======
+	// Set FIFO destination for each filter
+	CAN_FFA1R rCAN1_FFA1R;
+	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
+	rCAN1_FFA1R.b.bffa0 = 0;		// Set filter0 to send message to FIFO0
+	rCAN1_FFA1R.b.bffa1 = 0;		// Set filter1 to send message to FIFO0
+	writeRegister(RCAN1_FFA1R, rCAN1_FFA1R.d32);
+
+	// Enable CAN reception now that filters are setup
+	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
+	rCAN1_FMR.b.bfinit = 0;	// Enable CAN reception
+	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
+>>>>>>>
 }
 
 void txCAN(CAN_msg *finalMessage)
@@ -448,7 +468,44 @@ void txCAN(CAN_msg *finalMessage)
 	}
 }
 
+<<<<<<<
 int checkTxMailbox()
+=======
+void rxCAN(void)
+{
+	// Check FIFO output mailbox
+	
+	// Read FIFO mailbox contents
+	
+	// Release FIFo mailbox by setting the RFOM bit in the CAN FRF register
+	CAN_RF0R rCAN1_RF0R;	// TODO 
+	rCAN1_RF0R.d32 = readRegister(RCAN_RF0R);
+	rCAN1_RF0R.b.brfom0 = 1;
+	
+	
+	// if FIFO is full and a new message has been received
+		// Clear FOVR0 bit;
+	
+	// if FIFO is full 
+		// FULL0 will be set
+		// FULL0 needs to be cleared by software
+	
+	writeRegister(RCAN_RF0R, rCAN1_RF0R.d32);
+	
+	// TODO - Repeat above code for FIFO 1
+	
+	// FIFO is now empty again
+	
+	// if another message is received, it goes into pending_2 (FMP = 0x10, CAN_RFR FOVR = 0), then pending_3 (FMP = 0x11, CAN_RFR FOVR = 0).
+	// if mailbox is full (CAN_RFR FOVR = 1) and a message has been lost\
+	
+	
+	// if 
+
+}
+
+int checkMailbox()
+>>>>>>>
 {
 	// determine free mailbox put mailbox_no as argument 
 	CAN_TSR rCAN1_TSR;
