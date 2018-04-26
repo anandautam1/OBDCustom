@@ -32,18 +32,22 @@ CAN_msg  CAN_TxMsg, CAN_RxMsg;
 
 unsigned int readRegister(volatile unsigned int * iregisterAddress);
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket);
+
 void configureAdc();
 int readAdc();
 
-void initializeCanFilters();
 void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type);
 
 void initializeLabSpecs();
+void initFilter();
+
 void txCAN(CAN_msg *finalMessage);
 void canTransmissionUniversal(CAN_msg *finalmessage, int mailboxNo);
 int checkTxMailbox();
-// TODO - prototype for RX DATA data
-// int rxCAN();
+
+void rxCAN(CAN_msg *msg);
+void fifoHandler(void);
+
 
 typedef union{
 	int integer;
@@ -118,6 +122,7 @@ int main(void)
 	// checked the can1_REMAP to be on 0x03 for PD0 & PD1
 	GPIOControl->enablePeripheral(PER_CAN1,REMAP0);
 	initializeLabSpecs();
+	initFilter();
 	
 	configureAdc();
 
@@ -140,7 +145,7 @@ int main(void)
 	led9Message->type = DATA_FRAME;
 	
 	// CAN Setup
-	canInit();
+	//canInit(); // OLD implementation 
 	
 	// LCD Code
 	GLCD_Init();
@@ -155,7 +160,6 @@ int main(void)
   // Main loop
   while (1)
   {
-		
 		int result = readAdc();
 		//char AdcLabel[10] = "ADC value = "
 		char resultChars[20]; 
@@ -204,6 +208,13 @@ int main(void)
 		adcMessage->type = DATA_FRAME;
 		
 		txCAN(adcMessage);
+		
+		// Read CAN Message
+		CAN_msg rx_msg;
+		
+		rxCAN(&rx_msg);
+		fifoHandler();
+		
 		// needed for the 5Hz update rate 
 		delay_software_ms(180);
   }
@@ -220,7 +231,8 @@ void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataP
 	*iregisterAddress = idataPacket;
 }
 
-void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type)  {
+void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type)  
+{
 	
 	static unsigned short CAN_filterIdx = 0;
          unsigned int   CAN_msgId     = 0;
@@ -274,7 +286,8 @@ void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_typ
   CAN_filterIdx += 1; 
 }
 
-void CAN_rdMsg ( CAN_msg *msg)  {
+void rxCAN ( CAN_msg *msg)  
+{
 	
   if ((CAN1->sFIFOMailBox[0].RIR & 0x4)==0) { //CAN_ID_EXT) == 0) { // Standard ID
     msg->format = STANDARD_FORMAT;
@@ -306,11 +319,22 @@ void CAN_rdMsg ( CAN_msg *msg)  {
   msg->data[7] = (unsigned int)0x000000FF & (CAN1->sFIFOMailBox[0].RDHR >> 24);
 }
 
+void fifoHandler(void)
+{
+	// Release FIFO 
+	CAN_RFxR rCAN1_RF0R;
+	rCAN1_RF0R.d32 = readRegister(RCAN1_RF0R);
+	rCAN1_RF0R.b.bfull = 0;		// Clear FIFO FULL flag
+	rCAN1_RF0R.b.brfom = 1;		// Release Mailbox
+	rCAN1_RF0R.b.bfovr = 0;  	// Clear overflow 
+	writeRegister(RCAN1_RF0R, rCAN1_RF0R.d32);
+}
+
 //CAN1 receiver interrupt
 void CAN1_RX0_IRQHandler(void) {
  GPIOE->BSRR = 1<<10;   //LED ON for observation on MSO  
  if (CAN1->RF0R & 3) {			      // message pending ?
-   CAN_rdMsg (&CAN_RxMsg);                       // read the message
+   rxCAN (&CAN_RxMsg);                       // read the message
 	 CAN1->RF0R |= 0x20;                    // Release FIFO 0 output mailbox 
    //   CAN_RxRdy = 1;                                // set receive flag
 	 
@@ -374,8 +398,8 @@ void initializeLabSpecs()
 	rCAN1_BTR.b.bts1 = 0x0B;
 	// set the baud rate 250kHz 
 	rCAN1_BTR.b.bbrp = 0x08;
-	// disable loopback 
-	rCAN1_BTR.b.blbkm = 0;
+	// enable loopback 
+	rCAN1_BTR.b.blbkm = 1;
 	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
 	
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
@@ -513,37 +537,6 @@ int checkTxMailbox()
 	{
 		return -1;
 	}
-}
-
-void rxCAN(void)
-{
-	// Check FIFO output mailbox
-	
-	// Read FIFO mailbox contents
-	
-	// Release FIFo mailbox by setting the RFOM bit in the CAN FRF register
-	//CAN_RF0R rCAN1_RF0R;	// TODO 
-	//rCAN1_RF0R.d32 = readRegister(RCAN_RF0R);
-	//rCAN1_RF0R.b.brfom0 = 1;
-	
-	
-	// if FIFO is full and a new message has been received
-		// Clear FOVR0 bit;
-	
-	// if FIFO is full 
-		// FULL0 will be set
-		// FULL0 needs to be cleared by software
-	
-	//writeRegister(RCAN_RF0R, rCAN1_RF0R.d32);
-	
-	// TODO - Repeat above code for FIFO 1
-	
-	// FIFO is now empty again
-	
-	// if another message is received, it goes into pending_2 (FMP = 0x10, CAN_RFR FOVR = 0), then pending_3 (FMP = 0x11, CAN_RFR FOVR = 0).
-	// if mailbox is full (CAN_RFR FOVR = 1) and a message has been lost\
-	
-	
 }
 
 int checkMailbox()
