@@ -345,37 +345,78 @@ void CAN1_RX0_IRQHandler(void) {
 void initializeLabSpecs()
 {
 	// delacre the variable register with the offset 
-	CAN_MCR rCAN1_MCR;
-	CAN_MSR rCAN1_MSR;
+	volatile CAN_MCR rCAN1_MCR;
+	volatile CAN_MSR rCAN1_MSR;
 	
 	CAN_BTR rCAN1_BTR;
-	CAN_TSR rCAN1_TSR;
+	
+	//CAN_TSR rCAN1_TSR;
 	// end of definition 
 	
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-	// initialize the bit 
-	rCAN1_MCR.b.binrq = 1;
-	// set to 1 even if packet error occurs 
-	rCAN1_MCR.b.bnart = 1;
-	// set reset to 1 to check if the periperhals has been resetted 
 	rCAN1_MCR.b.breset = 1;
-	// exit the sleep mode 
-	rCAN1_MCR.b.bsleep = 0;
-	// Set the CAN mailbox to overwrite old data when it is full
-	rCAN1_MCR.b.brflm = 0;
 	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
 	
 	// what till the MCR has been free
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
-	while(rCAN1_MCR.b.breset)
+	while(rCAN1_MCR.b.breset == 1)
 	{
 		rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+		// timeout is less than x 
 	}
-	 
+	
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	// initialize the bit 
+	rCAN1_MCR.b.binrq = 1;
+	writeRegister(RCAN1_MCR , rCAN1_MCR.d32);
+	
+	// reat the init
+	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+	while(rCAN1_MSR.b.binak == 0)
+	{
+		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+		// timeout is less than x 
+	}
+	
+	// set the timing register 
+	rCAN1_BTR.d32 = readRegister(RCAN1_BTR); 
+	
+	// BTR bit timing register
+	// loopback mode 
 	// the apbr1 default clock is 36MHz 
 	// bit field 8 brp set to 8 ... 
-	rCAN1_BTR.b.bbrp = 8;
-	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);	
+	// resynchronization 
+	rCAN1_BTR.b.bsjw = 0x02;
+	// time segment 2
+	rCAN1_BTR.b.bts2 = 0x02;
+	// time segment 1 
+	rCAN1_BTR.b.bts1 = 0x0B;
+	// set the baud rate 250kHz 
+	rCAN1_BTR.b.bbrp = 0x08;
+	// disable loopback 
+	rCAN1_BTR.b.blbkm = 0;
+	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
+	
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	// set to 1 even if packet error occurs 
+	rCAN1_MCR.b.bnart = 1;
+	writeRegister(RCAN1_MCR, rCAN1_MCR.d32);
+	// set reset to 1 to check if the periperhals has been resetted 
+	// exit the sleep mode 
+	
+	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
+	// set to 1 even if packet error occurs 
+	rCAN1_MCR.b.binrq = 0;
+	rCAN1_MCR.b.bsleep = 0;
+	writeRegister(RCAN1_MCR, rCAN1_MCR.d32);
+	
+	// read the init
+	rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+	while(rCAN1_MSR.b.binak == 1)
+	{
+		rCAN1_MSR.d32 = readRegister(RCAN1_MSR);
+		// timeout is less than x 
+	}
 }
 
 
