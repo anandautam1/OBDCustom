@@ -468,7 +468,27 @@ void txCAN(CAN_msg *finalMessage)
 
 int checkTxMailbox()
 {
-	return 0;
+	// determine free mailbox put mailbox_no as argument 
+	CAN_TSR rCAN1_TSR;
+	rCAN1_TSR.d32 = readRegister(RCAN1_TSR);
+	// on the CAN_TSR do the following 
+	// check tsr on TME2 , TME1 , TME0 on set (high) when there are not transmission 
+	if(rCAN1_TSR.b.btme0 == 1)
+	{
+		return 0;
+	}
+	if(rCAN1_TSR.b.btme1 == 1)
+	{
+		return 1;
+	}
+	if(rCAN1_TSR.b.btme2 == 1)
+	{
+		return 2;
+	}
+	else
+	{
+		return -1;
+	}
 }
 
 void rxCAN(void)
