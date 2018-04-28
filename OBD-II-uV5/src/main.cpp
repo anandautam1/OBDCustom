@@ -13,8 +13,8 @@
 //#include <iostream>
 #include <string>
 
-#define IDRX0 0x0BADCAFE
-//#define IDRX0 0x01A4F2B
+//#define IDRX0 0x0BADCAFE
+#define IDRX0 0x01A4F2B
 #define IDRX1 0x0024FCE
 
 #define STANDARD_FORMAT  0
@@ -222,6 +222,26 @@ int main(void)
 			CAN_msg rx_msg;
 			
 			rxCAN(&rx_msg);
+			if (rx_msg.id == IDRX0)
+			{
+					RESULT temp;
+					int loop = rx_msg.len;
+					for(int i = 0; i < loop; i++)
+					{
+						temp.bytes[i] = rx_msg.data[i];
+					}
+					//GPIO
+			}
+			else if (rx_msg.id == IDRX1)
+			{
+					RESULT temp;
+					int loop = rx_msg.len;
+					for(int i = 0; i < loop; i++)
+					{
+						temp.bytes[i] = rx_msg.data[i];
+					}
+			}
+			
 			fifoHandler();
 		}
 		
@@ -241,61 +261,6 @@ unsigned int readRegister(volatile unsigned int * iregisterAddress){
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket){
 	*iregisterAddress = idataPacket;
 }
-
-//void CAN_wrFilter (unsigned int id, unsigned char format, unsigned char mess_type)  
-//{
-//	
-//	static unsigned short CAN_filterIdx = 0;
-//         unsigned int   CAN_msgId     = 0;
-//	
-//	if (CAN_filterIdx > 13) {                       // check if Filter Memory is full
-//    return;
-//  }
-//	
-//  // Setup identifier information
-//  if (format == STANDARD_FORMAT)  {               // Standard ID
-//      CAN_msgId  |= (unsigned int)(id << 21) | 0; //CAN_ID_STD;
-//  }  else  {                                      // Extended ID
-//      CAN_msgId  |= (unsigned int)(id <<  3) | 4; //CAN_ID_EXT;
-//  }
-//  if (mess_type == 1)	CAN_msgId  |= 2;
-
-//	CAN_FA1R rCAN1_FA1R;
-//	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
-//	rCAN1_FA1R.d32 &= ~(unsigned int) (1 << CAN_filterIdx);
-//	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
-//	
-//  // initialize filter
-//	// set 32-bit scale configuration
-//	CAN_FS1R rCAN1_FS1R;
-//	rCAN1_FS1R.d32 = readRegister(RCAN1_FS1R);
-//	rCAN1_FS1R.d32 |= (unsigned int) (1 << CAN_filterIdx);
-//	writeRegister(RCAN1_FS1R, rCAN1_FS1R.d32);
-//	
-//	// set 2 32-bit identifier list mode
-//	CAN_FM1R rCAN1_FM1R;
-//	rCAN1_FM1R.d32 = readRegister(RCAN1_FM1R);
-//	rCAN1_FM1R.d32 |= (unsigned int)(1 << CAN_filterIdx);
-//  writeRegister(RCAN1_FM1R, rCAN1_FM1R.d32);
-
-//	// not sure on how to use the classes for the array register access on the register better best to leave it 
-//  CAN1->sFilterRegister[CAN_filterIdx].FR1 = CAN_msgId; //  32-bit identifier
-//  CAN1->sFilterRegister[CAN_filterIdx].FR2 = CAN_msgId; //  32-bit identifier
-//    													   
-//	// assign filter to FIFO 0
-//	CAN_FFA1R rCAN1_FFA1R;
-//	rCAN1_FFA1R.d32 = readRegister(RCAN1_FFA1R);
-//	rCAN1_FFA1R.d32 &= ~(unsigned int)(1 << CAN_filterIdx); 
-//	writeRegister(RCAN1_FFA1R, rCAN1_FFA1R.d32);
-//	
-//	// activate filter
-//	rCAN1_FA1R.d32 = readRegister(RCAN1_FA1R);
-//	rCAN1_FA1R.d32 |=  (unsigned int)(1 << CAN_filterIdx);
-//	writeRegister(RCAN1_FA1R, rCAN1_FA1R.d32);
-//  
-//	// increment the static variable for any instanceof a new filter 
-//  CAN_filterIdx += 1; 
-//}
 
 void rxCAN ( CAN_msg *msg)  
 {
