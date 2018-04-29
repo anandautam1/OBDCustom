@@ -127,7 +127,7 @@ int main(void)
 	
 	configureAdc();
 
-	unsigned char led8Data[4] = {0x01};
+	unsigned char led8Data[4] = {0x00};
 	CAN_msg led8Message[1];
 	led8Message->id = 0x01AEFCA;
 	for (int i = 0; i < 1; i++) 
@@ -136,7 +136,7 @@ int main(void)
 	led8Message->format = EXTENDED_IDENTIFIER;
 	led8Message->type = DATA_FRAME;
 	
-	unsigned char led9Data[4] = {0x01};
+	unsigned char led9Data[4] = {0x00};
 	CAN_msg led9Message[1];
 	led9Message->id = 0x002BEF;
 	for (int i = 0; i < 1; i++) 
@@ -154,10 +154,6 @@ int main(void)
 	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
 	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
 	
-	// enable interrupt 
-	//initializeCanFilters();
-	//NVIC->ISER[0] |= (1 << 20);       // enable CAN1_Rx interrupt
-	
   // Main loop
   while (1)
   {
@@ -170,26 +166,40 @@ int main(void)
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
+			 unsigned char led8Data[4] = {0x01};
+			 for (int i = 0; i < 1; i++) 
+			 {led8Message->data[i] = led8Data[i];}
 			 txCAN(led8Message);
-			// DEBUG
+			 // DEBUG
 			 GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		else
 		{
-			// DEBUG 
+			 unsigned char led8Data[4] = {0x00};
+			 for (int i = 0; i < 1; i++) 
+			 {led8Message->data[i] = led8Data[i];}
+			 txCAN(led8Message);
+			 // DEBUG 
 			 GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		
 		// Read Wakeup Button
 		if ((GPIOControl->getPinValue(Pin_A->Port, Pin_A->Pin)))
 		{
+			 unsigned char led9Data[4] = {0x01};
+			 for (int i = 0; i < 1; i++) 
+				{led8Message->data[i] = led8Data[i];}
 			 txCAN(led9Message);
-			// DEBUG
+			 // DEBUG
 			 GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		else
 		{
-			// DEBUG 
+			 unsigned char led9Data[4] = {0x00};
+			 for (int i = 0; i < 1; i++) 
+			 {led9Message->data[i] = led9Data[i];}
+			 txCAN(led9Message);
+			 // DEBUG 
 			 GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		// deafult is to send the adc value of the trimpot regardless 
@@ -210,8 +220,6 @@ int main(void)
 		
 		txCAN(adcMessage);
 		
-		delay_software_ms(10);	// TODO - This might not be needed
-		
 		// Read CAN Message
 		// Check if FIFO has a message
 		CAN_RFxR rCAN1_RF0R;
@@ -219,8 +227,7 @@ int main(void)
 		
 		if (rCAN1_RF0R.b.bfmp > 0)
 		{
-			CAN_msg rx_msg;
-			
+			CAN_msg rx_msg;	
 			rxCAN(&rx_msg);
 			if (rx_msg.id == IDRX0)
 			{
@@ -230,7 +237,10 @@ int main(void)
 					{
 						temp.bytes[i] = rx_msg.data[i];
 					}
-					//GPIO
+				 GLCD_DisplayString(5, 1, (unsigned char*)"CAN message address: ");
+				 GLCD_DisplayString(6, 1, (unsigned char*)rx_msg.id);
+				 GLCD_DisplayString(7, 1, (unsigned char*)"CAN message data: ");
+				 GLCD_DisplayString(8, 1, (unsigned char*)CAN_RxMsg.data);
 			}
 			else if (rx_msg.id == IDRX1)
 			{
@@ -240,8 +250,11 @@ int main(void)
 					{
 						temp.bytes[i] = rx_msg.data[i];
 					}
+				 GLCD_DisplayString(5, 1, (unsigned char*)"CAN message address: ");
+				 GLCD_DisplayString(6, 1, (unsigned char*)rx_msg.id);
+				 GLCD_DisplayString(7, 1, (unsigned char*)"CAN message data: ");
+				 GLCD_DisplayString(8, 1, (unsigned char*)rx_msg.data);
 			}
-			
 			fifoHandler();
 		}
 		
@@ -255,13 +268,22 @@ int main(void)
 // Function Definitions
 ================================================================================*/
 
+/* ===============================================================================
+// Read register function based on the register address
+================================================================================*/
 unsigned int readRegister(volatile unsigned int * iregisterAddress){
 	return (*iregisterAddress);
 }
+/* ===============================================================================
+// Write register function based on the register address
+================================================================================*/
 void writeRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket){
 	*iregisterAddress = idataPacket;
 }
 
+/* ===============================================================================
+// Read the recieve mailbox fifo and passed the result on the msg (struct) being passed 
+================================================================================*/
 void rxCAN ( CAN_msg *msg)  
 {
 	CAN_RIxR rCAN1_RI0R;
@@ -307,6 +329,9 @@ void rxCAN ( CAN_msg *msg)
 	msg->data[7] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32 >> 24);
 }
 
+/* ===============================================================================
+// Handle the fifo flags 
+================================================================================*/
 void fifoHandler(void)
 {
 	// Release FIFO 
@@ -316,23 +341,6 @@ void fifoHandler(void)
 	rCAN1_RF0R.b.brfom = 1;		// Release Mailbox
 	rCAN1_RF0R.b.bfovr = 0;  	// Clear overflow 
 	writeRegister(RCAN1_RF0R, rCAN1_RF0R.d32);
-}
-
-//CAN1 receiver interrupt
-void CAN1_RX0_IRQHandler(void) {
- GPIOE->BSRR = 1<<10;   //LED ON for observation on MSO  
- if (CAN1->RF0R & 3) {			      // message pending ?
-   rxCAN (&CAN_RxMsg);                       // read the message
-	 CAN1->RF0R |= 0x20;                    // Release FIFO 0 output mailbox 
-   //   CAN_RxRdy = 1;                                // set receive flag
-	 
-	 GLCD_DisplayString(5, 1, (unsigned char*)"CAN message address: ");
-	 GLCD_DisplayString(6, 1, (unsigned char*)CAN_RxMsg.id);
-	 GLCD_DisplayString(7, 1, (unsigned char*)"CAN message data: ");
-	 GLCD_DisplayString(8, 1, (unsigned char*)CAN_RxMsg.data);
-	 
-	 GPIOE->BSRR = 1<<(10+16);  // LED OFF
- }
 }
 
 void initializeLabSpecs()
@@ -412,12 +420,11 @@ void initializeLabSpecs()
 	}
 }
 
-
+// =======================================================
+// CAN Filter Initialization
+// =======================================================
 void initFilter(void)
 {
-	// =======================================================
-	// CAN Filter Initialization
-	// =======================================================
 	
 	// Disable CAN reception to set CAN filters
 	CAN_FMR rCAN1_FMR;
@@ -474,18 +481,11 @@ void initFilter(void)
 	writeRegister(RCAN1_FMR, rCAN1_FMR.d32);
 }
 
-void txCAN(CAN_msg *finalMessage)
-{
-	// need to be enabled when performing sending 
-	// CAN_TIxR rCAN_TI1R;
-	// need to be enabled first 
-	// CAN_TDTxR rCAN_TDT1R;
-	// mailbox registers
-	// low bit 
-	// CAN_TDLxR rCAN_TDL1R;
-	// high bit
-	// CAN_TDHxR rCAN_TDH1R;
-	
+// =======================================================
+// CAN Transmission by passing the strcut 
+// =======================================================
+	void txCAN(CAN_msg *finalMessage)
+{	
 	int mailbox_no = checkTxMailbox(); 
 	if(mailbox_no == 0 || mailbox_no == 1 || mailbox_no == 2)
 	{
@@ -501,7 +501,9 @@ void txCAN(CAN_msg *finalMessage)
 	}
 }
 
-
+// ====================================================================
+// Check the mailbox and return which mailbox is free or else return -1
+// ====================================================================
 int checkTxMailbox()
 {
 	// determine free mailbox put mailbox_no as argument 
@@ -527,31 +529,9 @@ int checkTxMailbox()
 	}
 }
 
-int checkMailbox()
-{
-	// determine free mailbox put mailbox_no as argument 
-	CAN_TSR rCAN1_TSR;
-	rCAN1_TSR.d32 = readRegister(RCAN1_TSR);
-	// on the CAN_TSR do the following 
-	// check tsr on TME2 , TME1 , TME0 on set (high) when there are not transmission 
-	if(rCAN1_TSR.b.btme0 == 1)
-	{
-		return 0;
-	}
-	if(rCAN1_TSR.b.btme1 == 1)
-	{
-		return 1;
-	}
-	if(rCAN1_TSR.b.btme2 == 1)
-	{
-		return 2;
-	}
-	else
-	{
-		return -1;
-	}
-}
-
+// =================================================================================================
+// Fucntion which actually transmit the message based on the struct and mailbox number being sent on
+// =================================================================================================
 void canTransmissionUniversal(CAN_msg *finalMessage, int mailboxNo)
 {
 		if(mailboxNo > 2 || mailboxNo < 0)
@@ -582,30 +562,9 @@ void canTransmissionUniversal(CAN_msg *finalMessage, int mailboxNo)
 		CAN1->sTxMailBox[mailboxNo].TIR |=  1;                     // transmit message
 }
 
-void toggle_led(int LED)
-{
-	int LED_BANK;
-	
-	LED_BANK = GPIOE->IDR;
-	
-	// If LED is on
-	if (LED_BANK & LED)
-	{
-		// Turn LED off
-		GPIOE->ODR &= ~(LED); 
-	}
-	else if (LED_BANK & ~(LED))
-	{
-		// Turn LED on
-		GPIOE->ODR |= LED;
-	}
-	else
-	{
-		// What is happening - Bad Case
-		LED = 256;
-	}	
-}
-
+// ========================================================================
+// Configure the ADC register to be enabled the clock and the right channel
+// ========================================================================
 void configureAdc()
 {
 	// Non urgent (to have the register config based on the class created)
@@ -633,6 +592,9 @@ void configureAdc()
 	while (ADC1->CR2 & (1<<2));	// wait until calibration finished.
 }
 
+// ============================================================================
+// Read adc based on the potentiometer and return integer value of the register
+// ============================================================================
 int readAdc()
 {
 	int result = 0; 
