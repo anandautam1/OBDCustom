@@ -130,6 +130,8 @@ int main(void)
 	unsigned char led8Data[4] = {0x00};
 	CAN_msg led8Message[1];
 	led8Message->id = 0x01AEFCA;
+	// debug only
+	//led8Message->id = IDRX0;
 	for (int i = 0; i < 1; i++) 
 	{led8Message->data[i] = led8Data[i];}
 	led8Message->len = 1;
@@ -139,6 +141,8 @@ int main(void)
 	unsigned char led9Data[4] = {0x00};
 	CAN_msg led9Message[1];
 	led9Message->id = 0x002BEF;
+	// debug only
+	//led9Message->id = IDRX1;
 	for (int i = 0; i < 1; i++) 
 	{led9Message->data[i] = led9Data[i];}
 	led9Message->len = 1;
@@ -188,7 +192,7 @@ int main(void)
 		{
 			 unsigned char led9Data[4] = {0x01};
 			 for (int i = 0; i < 1; i++) 
-				{led8Message->data[i] = led8Data[i];}
+			 {led9Message->data[i] = led9Data[i];}
 			 txCAN(led9Message);
 			 // DEBUG
 			 GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
@@ -229,6 +233,7 @@ int main(void)
 		{
 			CAN_msg rx_msg;	
 			rxCAN(&rx_msg);
+			//IDRX0 0x01A4F2B
 			if (rx_msg.id == IDRX0)
 			{
 					RESULT temp;
@@ -237,11 +242,12 @@ int main(void)
 					{
 						temp.bytes[i] = rx_msg.data[i];
 					}
-				 GLCD_DisplayString(5, 1, (unsigned char*)"CAN message address: ");
-				 GLCD_DisplayString(6, 1, (unsigned char*)rx_msg.id);
-				 GLCD_DisplayString(7, 1, (unsigned char*)"CAN message data: ");
-				 GLCD_DisplayString(8, 1, (unsigned char*)CAN_RxMsg.data);
+				  if(temp.integer > 0)
+					{
+						GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
+					}
 			}
+			//IDRX1 0x0024FCE
 			else if (rx_msg.id == IDRX1)
 			{
 					RESULT temp;
@@ -250,17 +256,17 @@ int main(void)
 					{
 						temp.bytes[i] = rx_msg.data[i];
 					}
-				 GLCD_DisplayString(5, 1, (unsigned char*)"CAN message address: ");
-				 GLCD_DisplayString(6, 1, (unsigned char*)rx_msg.id);
-				 GLCD_DisplayString(7, 1, (unsigned char*)"CAN message data: ");
-				 GLCD_DisplayString(8, 1, (unsigned char*)rx_msg.data);
+				  if(temp.integer > 0)
+					{
+						GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
+					}
 			}
 			fifoHandler();
 		}
 		
 		// needed for the 5Hz update rate 
 		// default was 180
-		delay_software_ms(60);
+		delay_software_ms(180);
   }
 } 
 
@@ -310,23 +316,23 @@ void rxCAN ( CAN_msg *msg)
 	msg->len = rCAN1_RDT0R.b.bdlc; 
 	
 	// Read data low register
-	CAN_TDLxR rCAN1_RDLR;
-	rCAN1_RDLR.d32 = readRegister(RCAN1_TDL0R);
+	CAN_RDLxR rCAN1_RDLR;
+	rCAN1_RDLR.d32 = readRegister(RCAN1_RDL0R);
 	
 	// Read data high register
-	CAN_TDHxR rCAN1_RDHR;
-	rCAN1_RDHR.d32 = readRegister(RCAN1_TDH0R);
+	CAN_RDHxR rCAN1_RDHR;
+	rCAN1_RDHR.d32 = readRegister(RCAN1_RHD0R);
 
 	// Read in data
-	msg->data[0] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32);
-	msg->data[1] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32 >> 8);
-	msg->data[2] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32 >> 16);
-	msg->data[3] = (unsigned int) 0x000000FF & (rCAN1_RDLR.d32 >> 24);
+	msg->data[0] = (unsigned int) 0x000000FF & (rCAN1_RDLR.b.bdata0);
+	msg->data[1] = (unsigned int) 0x000000FF & (rCAN1_RDLR.b.bdata1);
+	msg->data[2] = (unsigned int) 0x000000FF & (rCAN1_RDLR.b.bdata2);
+	msg->data[3] = (unsigned int) 0x000000FF & (rCAN1_RDLR.b.bdata3);
 
-	msg->data[4] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32);
-	msg->data[5] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32 >> 8);
-	msg->data[6] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32 >> 16);
-	msg->data[7] = (unsigned int) 0x000000FF & (rCAN1_RDHR.d32 >> 24);
+	msg->data[4] = (unsigned int) 0x000000FF & (rCAN1_RDHR.b.bdata4);
+	msg->data[5] = (unsigned int) 0x000000FF & (rCAN1_RDHR.b.bdata5);
+	msg->data[6] = (unsigned int) 0x000000FF & (rCAN1_RDHR.b.bdata6);
+	msg->data[7] = (unsigned int) 0x000000FF & (rCAN1_RDHR.b.bdata7);
 }
 
 /* ===============================================================================
@@ -394,8 +400,8 @@ void initializeLabSpecs()
 	rCAN1_BTR.b.bts1 = 0x0B;
 	// set the baud rate 250kHz 
 	rCAN1_BTR.b.bbrp = 0x08;
-	// enable loopback 
-	rCAN1_BTR.b.blbkm = 1;
+	// disable loopback 
+	rCAN1_BTR.b.blbkm = 0;
 	writeRegister(RCAN1_BTR, rCAN1_BTR.d32);
 	
 	rCAN1_MCR.d32 = readRegister(RCAN1_MCR);
