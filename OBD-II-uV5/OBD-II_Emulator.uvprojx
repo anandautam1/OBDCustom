@@ -411,11 +411,6 @@
               <FileType>8</FileType>
               <FilePath>.\src\DispCode.cpp</FilePath>
             </File>
-            <File>
-              <FileName>canController.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\canController.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -485,11 +480,6 @@
               <FileName>system_stm32f10x_cl.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\system_stm32f10x_cl.h</FilePath>
-            </File>
-            <File>
-              <FileName>canController.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\canController.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -906,11 +896,6 @@
               <FileType>8</FileType>
               <FilePath>.\src\DispCode.cpp</FilePath>
             </File>
-            <File>
-              <FileName>canController.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\canController.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -980,11 +965,6 @@
               <FileName>system_stm32f10x_cl.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\system_stm32f10x_cl.h</FilePath>
-            </File>
-            <File>
-              <FileName>canController.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\canController.h</FilePath>
             </File>
           </Files>
         </Group>

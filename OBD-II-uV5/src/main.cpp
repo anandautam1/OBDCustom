@@ -7,7 +7,6 @@
 #include "GPIOController.h"
 #include "utility.h"
 #include "canRegisters.h"
-#include "canController.h"
 #include "DispCode.h"
 
 //#include <iostream>
@@ -175,7 +174,7 @@ int main(void)
 			 {led8Message->data[i] = led8Data[i];}
 			 txCAN(led8Message);
 			 // DEBUG
-			 GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
+			 //GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		else
 		{
@@ -184,7 +183,7 @@ int main(void)
 			 {led8Message->data[i] = led8Data[i];}
 			 txCAN(led8Message);
 			 // DEBUG 
-			 GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
+			 //GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 		}
 		
 		// Read Wakeup Button
@@ -195,7 +194,7 @@ int main(void)
 			 {led9Message->data[i] = led9Data[i];}
 			 txCAN(led9Message);
 			 // DEBUG
-			 GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
+			 //GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		else
 		{
@@ -204,7 +203,7 @@ int main(void)
 			 {led9Message->data[i] = led9Data[i];}
 			 txCAN(led9Message);
 			 // DEBUG 
-			 GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
+			 //GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 		}
 		// deafult is to send the adc value of the trimpot regardless 
 		
@@ -233,6 +232,7 @@ int main(void)
 		{
 			CAN_msg rx_msg;	
 			rxCAN(&rx_msg);
+			
 			//IDRX0 0x01A4F2B
 			if (rx_msg.id == IDRX0)
 			{
@@ -245,6 +245,10 @@ int main(void)
 				  if(temp.integer > 0)
 					{
 						GPIOControl->setGPIO(Pin_E8->Port,Pin_E8->Pin);
+					}
+					else
+					{
+						GPIOControl->resetGPIO(Pin_E8->Port,Pin_E8->Pin);
 					}
 			}
 			//IDRX1 0x0024FCE
@@ -259,6 +263,10 @@ int main(void)
 				  if(temp.integer > 0)
 					{
 						GPIOControl->setGPIO(Pin_E9->Port,Pin_E9->Pin);
+					}
+					else
+					{
+						GPIOControl->resetGPIO(Pin_E9->Port,Pin_E9->Pin);
 					}
 			}
 			fifoHandler();

@@ -3,6 +3,7 @@
 #include "rccRegisters.h"
 #include "utility.h"
 
+/*
 void canInit()
 {
 	// setup the GPIO and AFIO 
@@ -26,3 +27,4 @@ unsigned int canreadRegister(volatile unsigned int * iregisterAddress){
 void canwriteRegister(volatile unsigned int * iregisterAddress, unsigned int idataPacket){
 	*iregisterAddress = idataPacket;
 }
+*/
