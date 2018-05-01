@@ -7,7 +7,6 @@
 #include "GPIOController.h"
 #include "utility.h"
 #include "canRegisters.h"
-#include "DispCode.h"
 
 //#include <iostream>
 #include <string>
@@ -139,7 +138,7 @@ int main(void)
 	
 	unsigned char led9Data[4] = {0x00};
 	CAN_msg led9Message[1];
-	led9Message->id = 0x002BEF;
+	led9Message->id = 0x0002BEF;
 	// debug only
 	//led9Message->id = IDRX1;
 	for (int i = 0; i < 1; i++) 
@@ -151,21 +150,10 @@ int main(void)
 	// CAN Setup
 	//canInit(); // OLD implementation 
 	
-	// LCD Code
-	GLCD_Init();
-	GLCD_Clear(White);
-	GLCD_DisplayString(1, 1, (unsigned char*)"Lab 3: CAN BUS");
-	GLCD_DisplayString(2, 1, (unsigned char*)"ADC Value:");
-	
   // Main loop
   while (1)
   {
 		int result = readAdc();
-		//char AdcLabel[10] = "ADC value = "
-		char resultChars[20]; 
-		std::sprintf(resultChars,"%i  ", result);
-		GLCD_DisplayString(3, 1, (unsigned char*)resultChars);
-		
 		// Read User Button
 		if (!(GPIOControl->getPinValue(Pin_B->Port, Pin_B->Pin)))
 		{
@@ -439,7 +427,6 @@ void initializeLabSpecs()
 // =======================================================
 void initFilter(void)
 {
-	
 	// Disable CAN reception to set CAN filters
 	CAN_FMR rCAN1_FMR;
 	rCAN1_FMR.d32 = readRegister(RCAN1_FMR);
@@ -503,14 +490,13 @@ void initFilter(void)
 	int mailbox_no = checkTxMailbox(); 
 	if(mailbox_no == 0 || mailbox_no == 1 || mailbox_no == 2)
 	{
-		GLCD_DisplayString(4, 1, (unsigned char*)"MAILBOX GOOD");
+		
 		canTransmissionUniversal(finalMessage,mailbox_no);
 		return;
 	}
 	if(mailbox_no == -1)
 	{
 		// there are no free mailbox just
-		GLCD_DisplayString(4, 1, (unsigned char*)"MAILBOX FULL");
 		return;
 	}
 }
